@@ -21,11 +21,11 @@ author:
     email: yiannis@selfienetworks.com
 
 normative:
-  RFC3986:
-  RFC4086:
-  RFC4648:
+  RFC7519:
   RFC7515:
   RFC7516:
+  RFC8152:
+  RFC8392:
   RFC5226:
 
 informative:
@@ -33,19 +33,23 @@ informative:
 
 --- abstract
 
-Network Tokens is a method to securely transfer claims between endpoints and a network to drive or assist network policy. They are inserted by endpoints in existing protocols, interpreted by trusted networks, and may be signed or encrypted to meet security and privacy requirements. Network Tokens can be represented as JSON Web Tokens, CBOR Web Tokens, or other available formats. They can be used to expose and access a variety of network services such as a firewall whitelists, QoS, and zero-rating services.
+Network Tokens is a method to securely transfer claims between endpoints and a network to drive or assist network policy. They are inserted by endpoints in existing protocols, interpreted by trusted networks, and may be signed or encrypted to meet security and privacy requirements. Network Tokens can be represented as JSON Web Tokens, CBOR Web Tokens, or other available formats. They can be used to expose and access a variety of network services such as firewall whitelists, QoS, and zero-rating services.
 
 --- middle
 
 # Introduction        {#intro}
 
-Network tokens is a method to securely expose and access whitelist-based network services, such as firewalls, zero-rating groups, and custom QoS SLAs. Tokens are given by network operators to eligible end users, and are subsequently attached to packets of a specific flow, essentially whitelisting this flow for the given service. 
+The JSON Web Token (JWT) [RFC7519] and CBOR Web Token (CWT) [RFC8392] are  standardized security token formats that have found use in OAuth 2.0, OpenID Connect, and Internet of Things deployments, among other applications. JWT and CWT use JSON Object Signature and Encryption (JOSE) and COBR Object Signature and Encryption (COSE) technologies to secure the contents of tokens, which essentially are a set of claims represented in JSON or CBOR. 
 
-Network tokens may be transmitted unencrypted, signed, or encrypted, and can be incorporated as options and extensions into a variety of existing protocols and workflows, like TLS handshakes, IPv6 options, STUN attributes. 
+This specification motivates and describes the use of tokens - named network tokens - as a method to securely transfer claims between endpoints and a network to drive and/or assist network policy. Network tokens are inserted by endpoints in existing protocols, interpreted by trusted networks, and may be signed or encrypted to meet a variety of security and privacy requirements. They can be encoded as JSON Web Tokens, CBOR Web Tokens, or other available formats.  Network tokens can be used to expose and access a variety of network services such as firewall whitelists, QoS, and zero-rating services.
 
 # Terminology
 
 * End Users: We use the term "end user" to broadly characterize a role that has control over an endpoint. This can be an individual user, an enterprise, an Operating System, or an application. 
+
+# Motivation
+* Discuss existing alternatives through DiffServ and DPI
+* Requirements from different perspectives (network operator, regulator, app developer, user)
 
 
 # Network Token Overview
@@ -203,6 +207,34 @@ Each token is valid for 24 hours. As the encryption key is bound to a specific u
 Besides accessing a low-latency service, this token serves two requirements: 
 * it is application agnostic and can be used for any application a user wants
 * it preserves privacy. There is no indication about specific applications, and no identifier that can be linked to a user. 
+
+# Network Tokens and Encapsulating protocols
+
+## Network Tokens as a TLS Extension
+
+## Network Tokens as a STUN Attribute
+
+## Network Tokens as an IPv6 Hop-by-Hop Extension Header
+
+
+
+# Implementation Considerations
+
+Things to discuss
+
+* Token --> DiffServ Mapping
+* Token reflect and reverse flow
+* Not every node needs to interpret tokens
+* Multiple networks / multiple recipients
+
+# Security Considerations
+
+As any cryptographic application, it is important for users of network tokens applications to protect asymmetric private and symmetric secret keys,  and employ countermeasures to various attacks. 
+
+The security of network tokens relies upon on the protections offered by the underlying signing and encryption technologies. It is therefore recommended that implementations of network tokens use existing and well-understood cryptographic frameworks (like JOSE and COSE) to protect tokens, or careful consider security implications if they provide their own format. 
+
+Network tokens may require processing in software, as current hardware platforms do not support cryptographic capabilities. This might impose a security risk and exposure to an attack, as traffic could be diverted towards the slow path, and in return degrade the overall performance of a node. It is recommended that implementations adequately account for such scenarios, either by setting a rate-limit to packets that go through a slow path or ensuring that the overall functionality is not affected. 
+
 
 # IANA Considerations
 
