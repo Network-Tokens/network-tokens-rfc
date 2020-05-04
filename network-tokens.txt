@@ -1,0 +1,560 @@
+
+
+
+
+TBD                                                         Y. Yiakoumis
+Internet-Draft                                      Selfie Networks, Inc
+Intended status: Informational                            April 13, 2020
+Expires: October 15, 2020
+
+
+                             Network Tokens
+                   draft-yiakoumis-network-tokens-00
+
+Abstract
+
+   Network Tokens is a method to securely transfer claims between
+   endpoints and a network to drive or assist network policy.  They are
+   inserted by endpoints in existing protocols and interpreted by
+   trusted networks.  Tokens may be signed or encrypted to meet security
+   and privacy requirements, and they can be represented as JSON Web
+   Tokens, CBOR Web Tokens, or other available formats.  Network tokens
+   can be used to expose and access a variety of network services such
+   as a firewall whitelists, QoS, and zero-rating services.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on October 15, 2020.
+
+Copyright Notice
+
+   Copyright (c) 2020 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (https://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+
+
+
+Yiakoumis               Expires October 15, 2020                [Page 1]
+
+Internet-Draft                networktokens                   April 2020
+
+
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
+   3.  Network Token Overview  . . . . . . . . . . . . . . . . . . .   3
+   4.  Contents and Representation . . . . . . . . . . . . . . . . .   3
+     4.1.  Network Token Common fields . . . . . . . . . . . . . . .   4
+       4.1.1.  'iss' (Issuer) field  . . . . . . . . . . . . . . . .   4
+       4.1.2.  "sub" (Subject) field . . . . . . . . . . . . . . . .   4
+       4.1.3.  "exp" (Expiration Time) field . . . . . . . . . . . .   5
+       4.1.4.  "iat" (Issued At) field . . . . . . . . . . . . . . .   5
+       4.1.5.  "nti" field (Network Token ID) field  . . . . . . . .   5
+       4.1.6.  "bip" field (Bound IP) field  . . . . . . . . . . . .   5
+     4.2.  Network Token Format  . . . . . . . . . . . . . . . . . .   5
+   5.  Example Network Tokens  . . . . . . . . . . . . . . . . . . .   6
+     5.1.  Firewall Whitelist Token  . . . . . . . . . . . . . . . .   6
+     5.2.  Low-latency Token . . . . . . . . . . . . . . . . . . . .   7
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
+     6.1.  Token Descriptor ID Registry  . . . . . . . . . . . . . .   8
+       6.1.1.  Initial Registry Contents . . . . . . . . . . . . . .   9
+     6.2.  IPv6 Hop-By-Hop options registration  . . . . . . . . . .   9
+     6.3.  TLS ExtensionType Registry  . . . . . . . . . . . . . . .   9
+     6.4.  STUN Attributes Registry  . . . . . . . . . . . . . . . .   9
+   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  10
+     7.1.  Normative References  . . . . . . . . . . . . . . . . . .  10
+     7.2.  Informative References  . . . . . . . . . . . . . . . . .  10
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  10
+
+1.  Introduction
+
+   Network tokens is a method to securely expose and access whitelist-
+   based network services, such as firewalls, zero-rating groups, and
+   custom QoS SLAs.  Tokens are given by network operators to eligible
+   end users, and are subsequently attached to packets of a specific
+   flow, essentially whitelisting this flow for the given service.
+
+   Network tokens may be transmitted unencrypted, signed, or encrypted,
+   and can be incorporated as options and extensions into a variety of
+   existing protocols and workflows, like TLS handshakes, IPv6 options,
+   STUN attributes.
+
+
+
+
+
+
+
+Yiakoumis               Expires October 15, 2020                [Page 2]
+
+Internet-Draft                networktokens                   April 2020
+
+
+2.  Terminology
+
+   o  End Users: We use the term "end user" to broadly characterize a
+      role that has control over an endpoint.  This can be an individual
+      user, an enterprise, an Operating System, or an application.
+
+3.  Network Token Overview
+
+   A network token is a small piece of data that end users attach to
+   their packets to access a whitelist-based network service.  As
+   packets flow through the network, intermediate nodes detect tokens,
+   interpret them, and apply the desired service to the packets that
+   carry them (and possibly to all other packets from the same flow).
+
+   Network tokens are always interpreted by a network operator.  Token
+   generation depends on the use case and trust relationship between the
+   different entities involved.  For example, tokens might be generated
+   by the network who distributes it to eligible end-users on-demand.
+   Alternatively, the operator can enable users to generate multiple
+   tokens themselves, or application providers might generate tokens and
+   tell operators how to interpret them.
+
+   To prevent unauthorized third-parties from replaying, spoofing, or
+   interpreting a token, tokens may be signed and encrypted, in ways
+   described below.  Network tokens can use custom or existing
+   representation formats, like JWT [RFC7515] or CWT [RFC7516].
+   Section XX discusses example tokens for specific usecases.
+
+   Network tokens do not dictate a dedicated header or protocol to be
+   inserted.  Instead, they are incorporated as options and extensions
+   into a variety of existing protocols.  For example, network tokens
+   can be carried as TLS Client and Server Hello extensions during a TLS
+   handshake, as IPv6 destination or Hop by Hop Options, or as
+   attributes during a STUN-enabled flow setup.  Network tokens are
+   largely opaque to the protocols that carry them.  Section XX
+   discusses implementation details for inserting tokens, and Section XX
+   lists recommended IANA registry changes for TLS, STUN, and IPv6.
+
+   The distribution of tokens is out of scope for this document.
+
+4.  Contents and Representation
+
+   The contents of a network token fulfil three main goals:
+
+   o  communicate the desired information between an endpoint and the
+      network (e.g., the name of an application, or a user key to
+      request low-latency services)
+
+
+
+
+Yiakoumis               Expires October 15, 2020                [Page 3]
+
+Internet-Draft                networktokens                   April 2020
+
+
+   o  prevent unauthorized parties from replaying or using these tokens
+      to inadvertently access network services (e.g., through the use of
+      timestamps, expiration time, nonces)
+
+   o  digitally sign and/or encrypt a token to meet privacy and security
+      requirements
+
+   Network operators can define their own structure to represent tokens,
+   for example through pre-defined byte sequences or a list of TLV-
+   encoded fields.  Alternatively, tokens can use JOSE and COSE
+   technologies for representation, as they already provide a framework
+   to securely communicate information between different entities.  The
+   actual representation and contents of a token should take into
+   consideration the capabilities of the network to process them (i.e,
+   what cryptographic functionality can the network support), length in
+   terms of header space, and requirements for integrity protection,
+   privacy preservation, and attack scenarios.
+
+   Examples in this document will use JWT to represent tokens, as they
+   are well understood by the community and easily read by humans.
+   Translation to a different representation format should be straight
+   forward.
+
+4.1.  Network Token Common fields
+
+   Network tokens can have arbitrary fields (or claims).  The fields
+   defined below, while not mandatory, provide a starting point for a
+   set of useful, interoperable fields.  Network services using network
+   tokens should define which specific fields they use and whether they
+   are required or optional.  Several of the fields listed below are
+   already registered as part of JWT and CWT specifications, while
+   others are specific for network tokens.
+
+4.1.1.  'iss' (Issuer) field
+
+   The "iss" (issuer) field identifies the principal that issued the
+   token.  For example, the issuer might be the name of the network
+   operator that offers the service of interest.  The processing of this
+   claim is generally application specific.
+
+4.1.2.  "sub" (Subject) field
+
+   The "sub" (subject) field identifies the principal that is the
+   subject of the token.  This could be a subscriber id, or the name of
+   an application.  The subject value MUST either be scoped to be
+   locally unique in the context of the issuer or be globally unique.
+   The processing of this claim is generally application specific.
+
+
+
+
+Yiakoumis               Expires October 15, 2020                [Page 4]
+
+Internet-Draft                networktokens                   April 2020
+
+
+4.1.3.  "exp" (Expiration Time) field
+
+   The "exp" (expiration time) field identifies the expiration time on
+   or after which the token MUST NOT be accepted for processing.  The
+   processing of the "exp" field requires that the current date/time
+   MUST be before the expiration date/time listed in the "exp" claim.
+   Implementers MAY provide for some small leeway, usually no more than
+   a few minutes, to account for clock skew.  The "exp" field can be
+   used to reduce the probability of replay attacks, restrict service
+   access to a certain period, or to force users to refresh
+   authentication credentials.
+
+4.1.4.  "iat" (Issued At) field
+
+   The "iat" (issued at) field identifies the time at which the token
+   was issued or generated.  This field can be used to determine the age
+   of the token, and can be used along or instead of the "exp" field.
+
+4.1.5.  "nti" field (Network Token ID) field
+
+   The "nti" field provides a nonce-like value for the token.  The
+   identifier value MUST be assigned in a manner that ensures that there
+   is a negligible probability that the same value will be accidentally
+   assigned to a different data object; if the application uses multiple
+   issuers, collisions MUST be prevented among values produced by
+   different issuers as well.  The "nti" field can be used to prevent
+   the token from being replayed.
+
+4.1.6.  "bip" field (Bound IP) field
+
+   The "bip" (Bound IP) field bounds the use of the token to a specific
+   IP address.  This can prevent third parties from reusing the token in
+   a different context.
+
+4.2.  Network Token Format
+
+   A token consists of the following fields (Figure X):
+
+   o  Reflect Type (4-bits): Indicates reflection properties for the
+      token.
+
+      *  0x0: Token is inserted by the origin of this flow.  No
+         reflection needed.
+
+      *  0x1: Token is inserted by the origin of this flow.  Reflect at
+         receiver.
+
+      *  0x2: Reflected token.
+
+
+
+Yiakoumis               Expires October 15, 2020                [Page 5]
+
+Internet-Draft                networktokens                   April 2020
+
+
+      *  0x3-0xf: Reserved
+
+   o  Token Descriptor ID (28-bits): An ID that helps the network decide
+      whether and how to interpret tokens.  Descriptor IDs are
+      registered in the "Token Descriptor ID" registry (MSB = 0) or
+      private (MSB equals 1).  For private descriptor IDs, the definer
+      of the value needs to take reasonable precautions to make sure
+      they are in control of the part of the namespace they use (e.g.,
+      by using a OUI prefix).  A token descriptor might just indicate
+      that the token payload is a JWT, or point to a structure that
+      holds keys and other information to interpret a token.
+
+   o  Token Payload: Depending on the application, the token payload
+      might be a self-contained JWT or CWT (as plaintext, signed, or
+      encrypted), a set of TLV-encoded values, or has its own custom
+      format.
+
+   The length of the token is arbitrary, but must follow the limitations
+   imposed by the protocol it is encapsulated.  For example, if the
+   token is carried as an IPv6 hop-by-hop option, the total length of
+   the token cannot exceed 256 bytes.
+
+                         0         1         2        3
+                         0123456789012345678901245678901
+                        +-------------------------------+
+                        |      token descriptor id      |
+                        +-------------------------------+
+                        |                               |
+                        |                               |
+                        |         token payload         |
+                        |                               |
+                        |                               |
+                        +-------------------------------+
+
+
+5.  Example Network Tokens
+
+   This section discusses example network tokens and how they can serve
+   specific use cases.
+
+5.1.  Firewall Whitelist Token
+
+   A firewall token can be used to whitelist traffic from trusted
+   applications.
+
+   The following example verifies that a network flow is coming from
+   "The Godfather App".
+
+
+
+
+Yiakoumis               Expires October 15, 2020                [Page 6]
+
+Internet-Draft                networktokens                   April 2020
+
+
+   The token payload is encoded as a JWT, and encapsulated as a TLS
+   Extension attached in a Server Hello Message.
+
+   The Reflect Type is 0x00 (i.e., this is the origin flow and peers
+   should not reflect it), with the expectation that firewalls can setup
+   appropriate state for the reverse flow as well.  The Token Descriptor
+   ID is 0x03, which might represent a registered value for firewall
+   tokens.
+
+   The JWT encodes the following object.
+
+   The header of the JWT has the following fields:
+
+   {"alg":"ES256", "kid":"N6fr1MDrEuu1eXRkFbcpX4WY62SKN7TKrhYf9PfJEd8"}
+
+
+   The token is signed using the Elliptic Curve Digital Signature
+   Algorithm, and the public key can be looked-up in a pre-defined
+   database using the "kid" thumbprint.
+
+   The JWT payload has the following fields:
+
+{"sub":"The Godfather App", "iat":1588116732, "exp":1588117732,"bip":"140.54.35.194"}
+
+   The token is created by the app provider.  It states that this flow
+   originates from "The Godfather App", along with the time that it was
+   created and when it expires.  The token is signed with the app
+   provider's public key, and any network can verify this through the
+   attached signature.  The token is also bound to a specific IP
+   address, and therefore cannot be reused in a different context.  For
+   example, the application provider could configure all exit gateways
+   to attach a token for all outgoing flows.
+
+5.2.  Low-latency Token
+
+   A low-latency token is used to access a custom QoS SLA from a mobile
+   operator tailored for video communications.  This is an application-
+   agnostic service, i.e., users can use it for any traffic they want.
+
+   The token payload is encoded as a JWT, and can be inserted to STUN
+   (as STUN attributes) or IPv6 packets (as IPv6 Hop-by-Hop extension
+   header).
+
+   The Reflect Type is 0x1, i.e., peers should reflect the token to
+   setup state for the reverse flow.  The Token Descriptor ID is 0x01,
+   stating that the token payload is a JWT object.
+
+   The header of the JWT has the following fields:
+
+
+
+Yiakoumis               Expires October 15, 2020                [Page 7]
+
+Internet-Draft                networktokens                   April 2020
+
+
+   {'alg':'dir','enc':"A256CBC-HS512", 'app_id':14098715987234}
+
+   The token is generated by the operator, and signed with the AES-256
+   algorith, using a customer-specific symmetric key.  The app_id points
+   is a local identifier, that the operator has associated with its own
+   services.
+
+   The payload of the token has the following fields, requesting for
+   low-latency treatment, and bounding the start and end time of the
+   token.  It also has a unique identifier to allow revocation.
+
+ {'srv':'lowlatency', 'nti': 5871234, iat':1588116732, 'exp':1588203132}
+
+   Each token is valid for 24 hours.  As the encryption key is bound to
+   a specific user, it cannot be used by another context.  The Operating
+   System (or an agent) in the user's device can request a token, and
+   grant it to specific applications based on a user's request.  Users
+   can revoke access by telling an operator to blacklist the nti
+   associated with this token.
+
+   Besides accessing a low-latency service, this token serves two
+   requirements: * it is application agnostic and can be used for any
+   application a user wants * it preserves privacy.  There is no
+   indication about specific applications, and no identifier that can be
+   linked to a user.
+
+6.  IANA Considerations
+
+6.1.  Token Descriptor ID Registry
+
+   This section establishes the IANA "Network Token Descriptor ID"
+   registry for token descriptors.  The registry records the descriptor
+   ID and a reference to the specification that defines it.
+
+   Values are registered on a Specification Required [RFC5226] basis
+   after a three-week review period, on the advice of one or more
+   Designated Experts.  However, to allow for the allocation of values
+   prior to publication, the Designated Experts may approve registration
+   once they are satisfied that such a specification will be published.
+
+   Within the review period, the Designated Experts will either approve
+   or deny the registration request, communicating this decision to the
+   review list and IANA.  Denials should include an explanation and, if
+   applicable, suggestions as to how to make the request successful.
+
+   Criteria that should be applied by the Designated Experts includes
+   determining whether the proposed registration duplicates existing
+   functionality, whether it is likely to be of general applicability or
+
+
+
+Yiakoumis               Expires October 15, 2020                [Page 8]
+
+Internet-Draft                networktokens                   April 2020
+
+
+   whether it is useful only for a single application, and whether the
+   registration description is clear.
+
+6.1.1.  Initial Registry Contents
+
+   o  Token Descriptor ID: 0x1
+
+   o  Description: Token is represented as a JSON Web Token
+
+   o  Specificaton Document(s): This document.
+
+   o  Token Descriptor ID: 0x2
+
+   o  Description: Token is represented as a Concise Binary
+      Representation Object
+
+   o  Specification Document(s): This document
+
+6.2.  IPv6 Hop-By-Hop options registration
+
+   This section registers the value 0x0F as a IPv6 Hop-By-Hop and
+   Destination Option for network tokens.
+
+   o  Hex Value: 0x1F
+
+   o  Binary Value: 0x00011111
+
+   o  Description: Network Token
+
+   o  Reference: This document
+
+6.3.  TLS ExtensionType Registry
+
+   This section registers the value 57 as a TLS Extension Type for
+   network tokens.
+
+   o  Value: 57
+
+   o  Description: Network Token
+
+   o  Reference: This document
+
+6.4.  STUN Attributes Registry
+
+   This section registers the value 0x001F as a STUN attribute for
+   network tokens.
+
+   o  Value: 0x001F
+
+
+
+Yiakoumis               Expires October 15, 2020                [Page 9]
+
+Internet-Draft                networktokens                   April 2020
+
+
+   o  Description: Network Token
+
+   o  Reference: This document
+
+7.  References
+
+7.1.  Normative References
+
+   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+              Resource Identifier (URI): Generic Syntax", STD 66,
+              RFC 3986, DOI 10.17487/RFC3986, January 2005,
+              <https://www.rfc-editor.org/info/rfc3986>.
+
+   [RFC4086]  Eastlake 3rd, D., Schiller, J., and S. Crocker,
+              "Randomness Requirements for Security", BCP 106, RFC 4086,
+              DOI 10.17487/RFC4086, June 2005,
+              <https://www.rfc-editor.org/info/rfc4086>.
+
+   [RFC4648]  Josefsson, S., "The Base16, Base32, and Base64 Data
+              Encodings", RFC 4648, DOI 10.17487/RFC4648, October 2006,
+              <https://www.rfc-editor.org/info/rfc4648>.
+
+   [RFC5226]  Narten, T. and H. Alvestrand, "Guidelines for Writing an
+              IANA Considerations Section in RFCs", RFC 5226,
+              DOI 10.17487/RFC5226, May 2008,
+              <https://www.rfc-editor.org/info/rfc5226>.
+
+   [RFC7515]  Jones, M., Bradley, J., and N. Sakimura, "JSON Web
+              Signature (JWS)", RFC 7515, DOI 10.17487/RFC7515, May
+              2015, <https://www.rfc-editor.org/info/rfc7515>.
+
+   [RFC7516]  Jones, M. and J. Hildebrand, "JSON Web Encryption (JWE)",
+              RFC 7516, DOI 10.17487/RFC7516, May 2015,
+              <https://www.rfc-editor.org/info/rfc7516>.
+
+7.2.  Informative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+Author's Address
+
+   Yiannis Yiakoumis
+   Selfie Networks, Inc
+
+   Email: yiannis@selfienetworks.com
+
+
+
+Yiakoumis               Expires October 15, 2020               [Page 10]
