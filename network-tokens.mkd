@@ -27,6 +27,9 @@ normative:
   RFC8152:
   RFC8392:
   RFC5226:
+  RFC8446:
+  RFC8200:
+  RFC5389:
 
 informative:
   RFC2119:
@@ -39,6 +42,8 @@ Network Tokens is a method to securely transfer claims between endpoints and a n
 
 # Introduction        {#intro}
 
+This specifications motivates and describes network tokens, a method to securely transfer clams between endpoints and a network to drive and/or assiste network policy. 
+
 The JSON Web Token (JWT) [RFC7519] and CBOR Web Token (CWT) [RFC8392] are  standardized security token formats that have found use in OAuth 2.0, OpenID Connect, and Internet of Things deployments, among other applications. JWT and CWT use JSON Object Signature and Encryption (JOSE) and COBR Object Signature and Encryption (COSE) technologies to secure the contents of tokens, which essentially are a set of claims represented in JSON or CBOR. 
 
 This specification motivates and describes the use of tokens - named network tokens - as a method to securely transfer claims between endpoints and a network to drive and/or assist network policy. Network tokens are inserted by endpoints in existing protocols, interpreted by trusted networks, and may be signed or encrypted to meet a variety of security and privacy requirements. They can be encoded as JSON Web Tokens, CBOR Web Tokens, or other available formats.  Network tokens can be used to expose and access a variety of network services such as firewall whitelists, QoS, and zero-rating services.
@@ -48,6 +53,10 @@ This specification motivates and describes the use of tokens - named network tok
 * End Users: We use the term "end user" to broadly characterize a role that has control over an endpoint. This can be an individual user, an enterprise, an Operating System, or an application. 
 
 # Motivation
+
+
+
+
 * Discuss existing alternatives through DiffServ and DPI
 * Requirements from different perspectives (network operator, regulator, app developer, user)
 
@@ -210,13 +219,175 @@ Besides accessing a low-latency service, this token serves two requirements:
 
 # Network Tokens and Encapsulating protocols
 
+Network tokens are inserted in existing protocols by leveraging extension capabilities and do not require a dedicated header. The contents of the token are largely opaque to the protocol that carries them (i.e., they cannot read or verify a token). 
+
+To support tokens, a protocol needs to allow its users to specify the token to be used (e.g., while opening a socket or configuring a connection), and appropriately reflect a token according to the value of a token's Reflect Type. 
+
+While tokens are designed to be self-contained, the protocols that carry them inevitably affect its use. In particular:
+
+- the maximum size of tokens is dictated by the provision of the protocol extension that carries them. 
+- Protocols that use a checksum over transmitted data (like TLS or optionally STUN) ensure that a token cannot be tampered or removed by intermediary nodes
+- Implementations should also consider whether the protocol guarantees that a token is contained in a single packet or might be carried over multiple packets. 
+
+This section discusses the use of tokens in three widely used protocols, and section {#iana} describes recommended IANA changes for each protocol. 
+
+For the examples below we will use the following 227-byte long network token, which encodes (in hex notation) the low-latency token described in Section {#lowlatencytoken}.
+
+~~~
+10000001 # Network token is represented as JWT, reflect at node
+65794a68624763694f694a6b615849694c434a6c626d4d694f694a424d6a553251304a444c556
+8544e544579496e302e2e565f4278546d4e692d6b6337735a376b504e514851412e5a42764269
+6d6d46705579555165e544579634b36244566a31378546d4e692d6b6337735a376b50476676c4
+7597579666f734b43565234744576306a4d31735f4352484c50706a6335536d37703336487576
+677541467c7979396f3a526e7976532484cd37703336487553559797170e514851412e5a42764
+2696d6d4670557955516576676c47597579666f734b43565234744576306a4d31716535597971
+702d5946796838566a396f72337a7351624e6d4e6475796974727658436854766c66633055704
+4545597d429869d34e5486a63963305f6a5267424f39745a6e4535438566a396fe64757969747
+27658766c6655704417e252636f267349565f36d585a6e4547568f7672637835f4352484c5417
+72e32556e32636a6f6a5267424f396349565f7869536d586357745a6e4535495475684973456a
+4f76726378472e3f9 # Network token payload (as JWE)
+~~~
+
 ## Network Tokens as a TLS Extension
+
+Network tokens can be encoded as TLS extensions during the handshake phase in ClientHello, ServerHello, and HelloRetryRequest messages, as these are defined in {{RFC8446}}. As the handshake happens before encryption is established between the two communicating endpoints, the token will be sent unchanged and can be interpreted by any trusted networks. 
+
+Network tokens used as TLS extension are flow-specific, i.e., the network should apply the policy linked to this token to all packets that belong to this flow. 
+
+The token comprises the extension data. Section {#iana} requests the value 57 as a Network Token extension type. For TLS backward compatibility, the first 16-bit after the extension type should encode the length of the extension data. The following bytestream defines the extension, including type and lengh data:
+
+~~~
+3900e3  # Network Token Extension with 227 bytes length
+1000001 # Network token is represented as JWT, reflect at node
+65794a68624763694f694a6b615849694c434a6c626d4d694f694a424d6a553251304a444c556
+8544e544579496e302e2e565f4278546d4e692d6b6337735a376b504e514851412e5a42764269
+6d6d46705579555165e544579634b36244566a31378546d4e692d6b6337735a376b50476676c4
+7597579666f734b43565234744576306a4d31735f4352484c50706a6335536d37703336487576
+677541467c7979396f3a526e7976532484cd37703336487553559797170e514851412e5a42764
+2696d6d4670557955516576676c47597579666f734b43565234744576306a4d31716535597971
+702d5946796838566a396f72337a7351624e6d4e6475796974727658436854766c66633055704
+4545597d429869d34e5486a63963305f6a5267424f39745a6e4535438566a396fe64757969747
+27658766c6655704417e252636f267349565f36d585a6e4547568f7672637835f4352484c5417
+72e32556e32636a6f6a5267424f396349565f7869536d586357745a6e4535495475684973456a
+4f76726378472e3f9 # Network token payload (as JWE)
+~~~
+
+If the reflect type is set to 0, the peer takes no additional step. If reflect type is 0x1, the peer should attach a Network Token request at the ServerHello message, set the type to 0x2, and copy the rest of the token in it. The extension data for the ServerHello message that reflects the token mentioned above is listed below.
+
+~~~
+3900e3  # Network Token Extension with 227 bytes length
+2000001 # Network token is represented as JWT, reflected token
+65794a68624763694f694a6b615849694c434a6c626d4d694f694a424d6a553251304a444c556
+8544e544579496e302e2e565f4278546d4e692d6b6337735a376b504e514851412e5a42764269
+6d6d46705579555165e544579634b36244566a31378546d4e692d6b6337735a376b50476676c4
+7597579666f734b43565234744576306a4d31735f4352484c50706a6335536d37703336487576
+677541467c7979396f3a526e7976532484cd37703336487553559797170e514851412e5a42764
+2696d6d4670557955516576676c47597579666f734b43565234744576306a4d31716535597971
+702d5946796838566a396f72337a7351624e6d4e6475796974727658436854766c66633055704
+4545597d429869d34e5486a63963305f6a5267424f39745a6e4535438566a396fe64757969747
+27658766c6655704417e252636f267349565f36d585a6e4547568f7672637835f4352484c5417
+72e32556e32636a6f6a5267424f396349565f7869536d586357745a6e4535495475684973456a
+4f76726378472e3f9 # Network token payload (as JWE)
+~~~
+
+TLS does not allow for extensions to be originated by the server if they are not defined in the ClientHello message. To account for cases where tokens need to be inserted by the server, the client might send an empty Network Token extension which allows the server to respond to with the appropriate token. Alternatively, the server can use a HelloRequestRetry message to ask the peer to re-send a ClientHello message with the NetworkToken extension included. The HelloRequestRetry should include the token. Depending on the reflect type the client peer might include an empty or populated Network Token extension on the subsequent ClientHello message. 
+
+The use of Network Token between ClientHello, ServerHello, and HelloRequestRetry messages resembles the mechanics of the cookie TLS extension. 
+
+The TLS handshake is protected for message integrity, and as such guarantees that network tokens cannot be dropped by intermediary nodes. 
+
 
 ## Network Tokens as a STUN Attribute
 
+Network tokens can be inserted as attributes in STUN Binding Request and Binding Response messages, during the handshake that preceeds WebRTC realtime communication flows {{RFC5389}}.  
+
+Network tokens used as STUN attributes are flow-specific, i.e., the network should apply the policy linked to this token to all packets that belong to this flow. 
+
+The token comprises the attribute data. Section {#iana} requests the value 0x001F as a Network Token STUN attribute. The following bytestream shows the attribute for the low-latency token described earlier, including attribute type and length. 
+
+(TODO: We need to deal with padding here as STUN requires 32-bit boundaries.)
+
+~~~
+001F00e3  # Network Token Attribute with 227 bytes length
+1000001 # Network token is represented as JWT, reflect at node
+65794a68624763694f694a6b615849694c434a6c626d4d694f694a424d6a553251304a444c556
+8544e544579496e302e2e565f4278546d4e692d6b6337735a376b504e514851412e5a42764269
+6d6d46705579555165e544579634b36244566a31378546d4e692d6b6337735a376b50476676c4
+7597579666f734b43565234744576306a4d31735f4352484c50706a6335536d37703336487576
+677541467c7979396f3a526e7976532484cd37703336487553559797170e514851412e5a42764
+2696d6d4670557955516576676c47597579666f734b43565234744576306a4d31716535597971
+702d5946796838566a396f72337a7351624e6d4e6475796974727658436854766c66633055704
+4545597d429869d34e5486a63963305f6a5267424f39745a6e4535438566a396fe64757969747
+27658766c6655704417e252636f267349565f36d585a6e4547568f7672637835f4352484c5417
+72e32556e32636a6f6a5267424f396349565f7869536d586357745a6e4535495475684973456a
+4f76726378472e3f9 # Network token payload (as JWE)
+~~~
+
+If the reflect type is set to 0, the peer takes no additional step. If reflect type is 0x1, the peer should attach a Network Token request at the Binding Response message, set the type to 0x2, and copy the rest of the token in it. The attribute data for the Binding Response message that reflects the token mentioned above is listed below.
+
+~~~
+001F00e3  # Network Token Extension with 227 bytes length
+2000001 # Network token is represented as JWT, reflected token
+65794a68624763694f694a6b615849694c434a6c626d4d694f694a424d6a553251304a444c556
+8544e544579496e302e2e565f4278546d4e692d6b6337735a376b504e514851412e5a42764269
+6d6d46705579555165e544579634b36244566a31378546d4e692d6b6337735a376b50476676c4
+7597579666f734b43565234744576306a4d31735f4352484c50706a6335536d37703336487576
+677541467c7979396f3a526e7976532484cd37703336487553559797170e514851412e5a42764
+2696d6d4670557955516576676c47597579666f734b43565234744576306a4d31716535597971
+702d5946796838566a396f72337a7351624e6d4e6475796974727658436854766c66633055704
+4545597d429869d34e5486a63963305f6a5267424f39745a6e4535438566a396fe64757969747
+27658766c6655704417e252636f267349565f36d585a6e4547568f7672637835f4352484c5417
+72e32556e32636a6f6a5267424f396349565f7869536d586357745a6e4535495475684973456a
+4f76726378472e3f9 # Network token payload (as JWE)
+~~~
+
+STUN messages can be protected for message integrity, and as such they can guarantee that network tokens cannot be dropped by intermediary nodes. 
+
 ## Network Tokens as an IPv6 Hop-by-Hop Extension Header
 
+Network tokens can be inserted as an IPv6 Hop-by-Hop Extension header, as defined in Section 4 of {{RFC8200}}.
 
+Network tokens used as IPv6 extension headers can be either flow or packet specific. The expectation must be defined by the network service itself, and the endpoints can decide to which packets to insert a token. For example, they can insert a token at every packet of a specific flow, every few seconds, or only at the first packet of a flow. The network should accordingly implement the policy. 
+
+When tokens are attached to all packets of a flow, it is important to keep the length of the token small, to avoid overhead. It is therefore recommended that in such cases implementations consider representation formats that can minimize the overall length of a token. Size-efficient representation formats are out-of-scope for this document. 
+
+The token comprises the IPv6 extension header data. Section {#iana} requests the value 0x1F as a Network Token Extension Header. The following bytestream shows the header for the low-latency token described earlier, including option type and length (in 8-octet units). 
+
+~~~
+1f1d  # Network Token Hop-by-Hop option with 29 8-octet length
+1000001 # Network token is represented as JWT, reflect at node
+65794a68624763694f694a6b615849694c434a6c626d4d694f694a424d6a553251304a444c556
+8544e544579496e302e2e565f4278546d4e692d6b6337735a376b504e514851412e5a42764269
+6d6d46705579555165e544579634b36244566a31378546d4e692d6b6337735a376b50476676c4
+7597579666f734b43565234744576306a4d31735f4352484c50706a6335536d37703336487576
+677541467c7979396f3a526e7976532484cd37703336487553559797170e514851412e5a42764
+2696d6d4670557955516576676c47597579666f734b43565234744576306a4d31716535597971
+702d5946796838566a396f72337a7351624e6d4e6475796974727658436854766c66633055704
+4545597d429869d34e5486a63963305f6a5267424f39745a6e4535438566a396fe64757969747
+27658766c6655704417e252636f267349565f36d585a6e4547568f7672637835f4352484c5417
+72e32556e32636a6f6a5267424f396349565f7869536d586357745a6e4535495475684973456a
+4f76726378472e3f9 # Network token payload (as JWE)
+~~~
+
+If the reflect type is set to 0, the peer takes no additional step. If reflect type is 0x1, the peer should attach the Network Token Hop-by-hop option for messages in the reverse direction for this flow, set the type to 0x2, and copy the rest of the token in it. The data for the Hop-By-Hop option that reflects the token mentioned above is listed below.
+
+~~~
+1f1d  # Network Token Hop-by-Hop option with 29-octet bytes length
+2000001 # Network token is represented as JWT, reflected token
+65794a68624763694f694a6b615849694c434a6c626d4d694f694a424d6a553251304a444c556
+8544e544579496e302e2e565f4278546d4e692d6b6337735a376b504e514851412e5a42764269
+6d6d46705579555165e544579634b36244566a31378546d4e692d6b6337735a376b50476676c4
+7597579666f734b43565234744576306a4d31735f4352484c50706a6335536d37703336487576
+677541467c7979396f3a526e7976532484cd37703336487553559797170e514851412e5a42764
+2696d6d4670557955516576676c47597579666f734b43565234744576306a4d31716535597971
+702d5946796838566a396f72337a7351624e6d4e6475796974727658436854766c66633055704
+4545597d429869d34e5486a63963305f6a5267424f39745a6e4535438566a396fe64757969747
+27658766c6655704417e252636f267349565f36d585a6e4547568f7672637835f4352484c5417
+72e32556e32636a6f6a5267424f396349565f7869536d586357745a6e4535495475684973456a
+4f76726378472e3f9 # Network token payload (as JWE)
+~~~
+
+TODO (YY): There is no clear way currently for peers to understand how to reflect tokens (per-packet, per-flow, and when). If this is understood by the context of the token the peer will need to be aware of the token, which is undesired. The token should have all information regarding reflection. We have to see whether the current two-bits can clarify this, or whether we need to make reflection part of the protocol-specific part and not the token itself. 
 
 # Implementation Considerations
 
@@ -236,7 +407,7 @@ The security of network tokens relies upon on the protections offered by the und
 Network tokens may require processing in software, as current hardware platforms do not support cryptographic capabilities. This might impose a security risk and exposure to an attack, as traffic could be diverted towards the slow path, and in return degrade the overall performance of a node. It is recommended that implementations adequately account for such scenarios, either by setting a rate-limit to packets that go through a slow path or ensuring that the overall functionality is not affected. 
 
 
-# IANA Considerations
+# IANA Considerations { #iana }
 
 ## Token Descriptor ID Registry
 
