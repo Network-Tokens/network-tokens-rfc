@@ -24,12 +24,12 @@ normative:
   RFC7519:
   RFC7515:
   RFC7516:
-  RFC8152:
   RFC8392:
   RFC5226:
   RFC8446:
   RFC8200:
   RFC5389:
+  RFC7872:
 
 informative:
   RFC2119:
@@ -391,18 +391,60 @@ TODO (YY): There is no clear way currently for peers to understand how to reflec
 
 # Implementation Considerations
 
-Things to discuss
+Network token applications (and their implementations) must decide the contents of the token, what protocol to insert them to, whether tokens are per-packet or per-flow, and whether they need to be reflected by peers on the reverse flow. This section discusses common consideration. 
 
-* Token --> DiffServ Mapping
-* Token reflect and reverse flow
-* Not every node needs to interpret tokens
-* Multiple networks / multiple recipients
+## Network Token contents
+
+When deciding the contents of a token, applications should take effort to include only the necessary information and keep the size of the token small. They should also take into consideration the trust relationships between different stakeholders (i.e., the network operator, the application provider, the operating system, the end user) and pick the right encryption and signing properties. Another element to consider is potential abuse scenarios and how to prevent token replays and protect from malicious users, given assumptions around the network architecture. For example, to prevent use of a user-specific token by a another user, a token might be bound to a user identifier that the network can separately verify while processing packets and tokens (e.g., a well-defined IP address or an IMSI in case of a cellular network).
+
+## Network Token protocol
+
+This specification describes three protocols where tokens might be inserted, and it is expected that this list will grow 
+
+IPv6 tokens sit at the narrow waist, can be applied to any traffic, and support both per-packet and per-flow granularity. IPv6 tokens require OS support for any practical usecase. The downside of IPv6 tokens is that IPv6 adoption is still limited, and many networks drop packets with IPv6 extension headers with rates described in {{RFC7872}}.
+
+TLS tokens are limited to TLS/DTLS sessions, and can only be used at a flow granularity. Implementation does not depend on the OS, but rather at the cryptographic library used (e.g., BoringSSL or OpenSSL). As TLS handshake is integrity-protected, intermediate nodes cannot drop or alter a token. 
+
+STUN tokens are targeted to real-time communications, and can only be used at a flow granularity. Implementation does not depend on the OS, but rather at the library that initiates the related flows (e.g., WebRTC). As STUN messages are integrity-protected, intermediate nodes cannot drop or alter a token. 
+
+The primary reason for making network tokens protocol agnostic is to ease adoption and enable interested parties (Operating System, application providers, users, network vendors and operators) to use them in a way that better fits the intended usecase. The protocol to use will largely depend on the parties involved in a usecase, the availability of tokens in different protocols, and the capability of endpoints and the network to insert and interpret tokens. 
+
+When possible, networks should make efforts to accept tokens in different protocols to allow further adoption from endpoints. As processing of tokens remains the same independent of the protocol that carries them, the main overhead from detecting tokens in multiple protocols will come from parsing and detecting tokens in different parts of the header. 
+
+## Network Token granularity
+
+The granularity of a token is either per-packet or per-flow and is interconnected with the protocol where tokens are inserted. The trade-offs for each option are discussed below. 
+
+### Per-packet granularity
+
+Per-packet granularity allows stateless processing from network nodes and the capability to pinpoint the exact packets for traffic differentiation (e.g., for flows that combine multple types of traffic). Moreover, it preserves policy if the flow of interest gets rerouted. 
+
+On the other hand, per-packet granularity limits potential encapsulating protocols. From the protocols described in this specification only IPv6 allows per-packet granularity, 
+
+Per-packet granularity implies that all packet processing will involve cryptographic functions which might be expensive (or unavailable). Finally, the size of the token should be small as it will add overhead to all packets. 
+
+
+### Per-flow granularity
+
+Tokens with per-flow granularity can be inserted in multiple protocols. As the token is sent only once per flow, its size is less important compared to per-packet tokens. Limiting crypto to one packet per flow reduces the packet processing overhead, and allows implementations that combine a fast path (with no crypto support) with a slow, crypto-enabled path.
+
+The main disadvantage of per-flow granularity is that it requires per-flow state. As policy enforcement depends on this state, per-flow granularity also requires that all packets of this flow will get routed through this node. 
+
+## Token to DiffServ mapping and reflection
+
+Tokens might be interpreted one or more times within a network. 
+
+In many cases, a single interpretation will be enough. One example is  network policies that are enforced at a single point and involve per-flow state (like zero-rating). In such scenarios, token interpretation and policy enforcement can take place all in once. Alternatively, when policy enforcement involves mutliple nodes (e.g., a low-latency service that spans the wired and radio network), network owners can use existing mechanisms (like DiffServ, QCI tags, or reflective QoS) to enforce the policy across multiple nodes within the same network domain. 
+
+In cases where a reverse flow might get routed through a different path, token reflection should be used. 
 
 # Security Considerations
 
-As any cryptographic application, it is important for users of network tokens applications to protect asymmetric private and symmetric secret keys,  and employ countermeasures to various attacks. 
+As any cryptographic application, it is important for users of network token applications to protect asymmetric private and symmetric secret keys,  and employ countermeasures to various attacks. 
 
 The security of network tokens relies upon on the protections offered by the underlying signing and encryption technologies. It is therefore recommended that implementations of network tokens use existing and well-understood cryptographic frameworks (like JOSE and COSE) to protect tokens, or careful consider security implications if they provide their own format. 
+
+While tokens are integrity protected, an intermediary node can in theory replace or remove a token. Protection against this can be provided by additional integrity protection from the encapsulating protocol itself, as is the case with TLS handshakes and STUN.
 
 Network tokens may require processing in software, as current hardware platforms do not support cryptographic capabilities. This might impose a security risk and exposure to an attack, as traffic could be diverted towards the slow path, and in return degrade the overall performance of a node. It is recommended that implementations adequately account for such scenarios, either by setting a rate-limit to packets that go through a slow path or ensuring that the overall functionality is not affected. 
 
