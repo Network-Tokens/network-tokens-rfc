@@ -94,8 +94,8 @@ Table of Contents
      7.2.  Network Tokens as a STUN Attribute  . . . . . . . . . . .  17
      7.3.  Network Tokens as an IPv6 Hop-by-Hop Extension Header . .  18
    8.  Implementation Considerations . . . . . . . . . . . . . . . .  19
-     8.1.  Network Token contents  . . . . . . . . . . . . . . . . .  20
-     8.2.  Network Token protocol  . . . . . . . . . . . . . . . . .  20
+     8.1.  Contents  . . . . . . . . . . . . . . . . . . . . . . . .  20
+     8.2.  Encapsulating protocol  . . . . . . . . . . . . . . . . .  20
      8.3.  Network Token granularity . . . . . . . . . . . . . . . .  21
        8.3.1.  Per-packet granularity  . . . . . . . . . . . . . . .  21
        8.3.2.  Per-flow granularity  . . . . . . . . . . . . . . . .  21
@@ -149,7 +149,7 @@ Internet-Draft                networktokens                     May 2020
    desired policy through token (or token metadata) distribution, and
    the cryptographic functions applied to them.
 
-   For example, A firewall whitelist token would state the name of the
+   For example, a firewall whitelist token would state the name of the
    application to be whitelisted, be signed with the private key of the
    application provider, and could be interpreted and verified by anyone
    with the application provider's public key.  It may also be bound to
@@ -214,8 +214,8 @@ Internet-Draft                networktokens                     May 2020
 
    This section discusses existing mechanisms that map traffic to
    network differentiation services, and then details some of the
-   challenges raised above through the perspective of multiple
-   stakeholders, and how network tokens can help to solve them.
+   challenges through the perspective of different stakeholders, and how
+   network tokens can help to address them.
 
 
 
@@ -270,9 +270,9 @@ Internet-Draft                networktokens                     May 2020
    differentiation services.
 
    The advantage of DPI is that it requires no changes from endpoints.
-   But as new usecases come-up, applications grow in complexity, and
+   But as new usecases come up, applications grow in complexity, and
    privacy or net neutrality requirements strengthen, its shortcomings
-   become more dominiant.
+   become more dominant.
 
 
 
@@ -285,9 +285,9 @@ Internet-Draft                networktokens                     May 2020
    o  Modern applications use a variety of protocols and architectures,
       integrate third-party services, establish connectivity through
       thousands of nodes, and constantly change.  Maintaining
-      application signatures requires frequent updates, involves manual
-      interactions, cannot cover third-party traffic scenarios, and can
-      therefore be inaccurate and expensive.
+      application signatures is manual, expensive, and often inaccurate.
+      They require frequent updates, involve manual interactions between
+      parties, and cannot cover third-party traffic scenarios.
 
    o  Application signatures are vulnerable to fraud, as bad actors can
       spoof certain fields (like Server Name Identification) and pretend
@@ -317,19 +317,19 @@ Internet-Draft                networktokens                     May 2020
 
    Network operators want to streamline the onboarding process for new
    applications in their programs, and also minimize the overhead to
-   keep these integrations functional and accurate.  Network tokens
-   enable operators to onboard new applications just by granting them a
-   new token and doesn't impose overhead to create, evaluate, and
-   maintain app signatures.  A token-based approach also decouples
-   integration from the architecture of an application provider, meaning
-   that there is no need for updates and maintenance every time an
-   application partner changes its infrastructure.
+   keep these integrations functional and accurate.  They also want to
+   make it easy for third parties to integrate and use their services.
+   Network tokens enable operators to onboard new applications just by
+   granting them a new token, without additional per-application
+   overhead to create, evaluate, and maintain app signatures.  A token-
+   based approach also decouples integration from the architecture of an
+   application provider, meaning that there is no need for updates and
+   maintenance every time an application partner changes its
+   infrastructure.
 
    Decoupling integration from an application's infrastructure is
    important for the provider's side as well.  They don't have to pace
    deployment of new servers to give partnering neteworks advance
-   warning to update their DPI, and they can still leverage a network's
-   services even when they don't own a server or when the traffic is
 
 
 
@@ -338,43 +338,44 @@ Yiakoumis               Expires November 8, 2020                [Page 6]
 Internet-Draft                networktokens                     May 2020
 
 
+   warning to update their DPI, and they can still leverage a network's
+   services even when they don't own a server or when the traffic is
    originating from a third-party service.  Another benefit for
    application providers is control.  Tokens give application providers
    the capability to decide when and how to use related services, so
    they can offer it only to a subset of their users, for a limited
    period, or run A/B experiments without any infrastructure overhead
-   and without further coordination with the network.  Network tokens
-   impose a trade-off for application providers, as they have to
-   incorporate them into their offerings.
+   and without further coordination with the network.
 
-   Regulatory requirements may dictate that zero-rating programs or
-   other specialized services are available to a large number of
-   application providers.  For example many zero-rating programs are
-   required to onboard all applications in a category.  Network tokens
-   offer a straight-forward and low overhead onboarding process, and
-   make it easier to keep implementations compliant.  Regulators may
-   also have to monitor commercial practices for compliance, and
-   therefore auditability becomes important.  With network tokens,
-   audits need to only check token distribution, which can be as simple
-   as a database with when an application asked for a token, and when
-   this was granted.
+   Regulators MAY require that zero-rating programs or other specialized
+   services are available to a large number of application providers.
+   For example many zero-rating programs are required to onboard all
+   applications in a category.  Network tokens offer a straight-forward
+   and low overhead onboarding process, and make it easier to keep
+   implementations compliant.  Regulators may also have to monitor
+   commercial practices for compliance, and therefore auditability
+   becomes important.  With network tokens, audits need to only check
+   token distribution, which can be as simple as a database with when an
+   application asked for a token, and when this was granted.
 
 2.2.2.  Detection Accuracy
 
    Detection accuracy captures what percentage of traffic that falls
    under a policy gets eventually detected and treated accordingly by
    the network.  It is one of the main criteria used during a zero-
-   rating integration, and where most problems appear, as many
-   applications use third-party traffic that cannot be properly
-   accounted for (like ads or social media add-ons), and application
-   backend changes are not properly communicated to or acted upon by the
-   network operator.
+   rating integration, and where most problems appear.  One reason is
+   that many applications involve traffic from third party servers that
+   cannot be properly accounted for (like ads, social media add-ons, or
+   traffic from public CDNs).  Another source of detection inaccuracy
+   comes from application backend changes that are not properly
+   communicated to or acted upon by the network operator.
 
    Many integrations do not happen just because of inaccuracy reasons,
-   when this falls below a threshold, causing issues for both
-   application providers and operators.  In other cases, application
-   providers might have to change the functionality for such
-   integrations to happen (e.g., disable ads).
+   causing issues for both application providers and operators.  In
+   other cases, application providers might have to change the
+   functionality for such integrations to happen (e.g., disable ads)
+   which can have a significant impact on their business and/or user
+   experience.
 
    Once an integration is established, failing to detect traffic may
    lead to uninteded charges for users and dissatisfaction.  Operators
@@ -385,7 +386,6 @@ Internet-Draft                networktokens                     May 2020
    inaccuracies are accepted, plan transparency issues arise (e.g.,
    users might get charged for use of an applications that is promoted
    as free).  In contrast, when inaccuracies are not allowed, many
-
 
 
 
@@ -416,18 +416,19 @@ Internet-Draft                networktokens                     May 2020
    This in turn makes integration harder.  Many application providers
    use CDNs that share IP addresses across multiple applications, and
    they become ineligible to participate.  Others that do have their own
-   IP addresses, can still integrate but at the cost of more frequent
+   IP addresses can still integrate, but at the cost of more frequent
    updates whenever as new servers (and IP addresses) are added.
 
-   Network tokens deal with fraud through signed tokens that can be
-   integrity protected and resistant to replay and spoofing attacks.
+   Network tokens deal with fraud through signed and/or encrypted tokens
+   that can be integrity protected and resistant to replay and spoofing
+   attacks.
 
 2.2.4.  Implementing user-centric control
 
-   One particular instance for traffic differentiation services (and
-   particular QoS services) is user-centric control.  This is be imposed
-   for business and regulatory reasons, and is equally important for
-   network operators, regulators, and end-users.
+   One particular instance of traffic differentiation services (and
+   particular QoS services) is user-centric control.  User-driven
+   control can better serve the needs of end-users, and might
+   additionally be driven by business and regulatory reasons.
 
    Network tokens provide the means to put users in charge of QoS
    treatment.  User-specific tokens can be applied to traffic directly,
@@ -444,7 +445,6 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-
 Yiakoumis               Expires November 8, 2020                [Page 8]
 
 Internet-Draft                networktokens                     May 2020
@@ -456,14 +456,15 @@ Internet-Draft                networktokens                     May 2020
    especially when networks have to inspect a user's traffic to enforce
    a service, and/or this happens without a user's consent.  Regulation
    around privacy, increased user awareness, as well as emerging
-   protocols like Encrypted SNI and DNS over HTTPS requireTokens can
-   address such concerns in a number of ways.
+   protocols like Encrypted SNI and DNS over HTTPS require new ways to
+   combine privacy awareness with traffic differentiation services.
+   Tokens can address such concerns in a number of ways.
 
    Coupled with user-centric control, network operators can expose
    datapath services in an application agnostic manner and respect user
    privacy.  They do not have to detect use of specific applications at
    all, all necessary information is included within a token, and users
-   explicitly share relevant information with the network.
+   explicitly share relevant information with the network upon consent.
 
    Network tokens can also promote privacy for application-based network
    services.  Today, if one network can detect an application (e.g.,
@@ -496,7 +497,6 @@ Internet-Draft                networktokens                     May 2020
    are well understood by the community and easily read by humans.
    Translation to a different representation format should be straight
    forward.
-
 
 
 
@@ -579,8 +579,8 @@ Internet-Draft                networktokens                     May 2020
    is a negligible probability that the same value will be accidentally
    assigned to a different data object; if the application uses multiple
    issuers, collisions MUST be prevented among values produced by
-   different issuers as well.  The "nti" field can be used to prevent
-   the token from being replayed.
+   different issuers as well.  The "nti" field can be used to revoke a
+   token, or prevent it from being replayed.
 
 4.1.6.  "bip" field (Bound IP) field
 
@@ -631,12 +631,12 @@ Internet-Draft                networktokens                     May 2020
    The length of the token is arbitrary, but must follow the limitations
    imposed by the protocol it is encapsulated.  For example, if the
    token is carried as an IPv6 hop-by-hop option, the total length of
-   the token cannot exceed 256 bytes.
+   the token cannot exceed 2048 bytes.
 
                          0         1         2        3
                          0123456789012345678901245678901
                         +-------------------------------+
-                        |      token descriptor id      |
+                        | rfl |  token descriptor id    |
                         +-------------------------------+
                         |                               |
                         |                               |
@@ -662,10 +662,10 @@ Internet-Draft                networktokens                     May 2020
    The token payload is encoded as a JWT, and encapsulated as a TLS
    Extension attached in a Server Hello Message.
 
-   The Reflect Type is 0x00 (i.e., this is the origin flow and peers
-   should not reflect it), with the expectation that firewalls can setup
-   appropriate state for the reverse flow as well.  The Token Descriptor
-
+   The Reflect Type is 0x00 (i.e., peers should not reflect it), with
+   the expectation that firewalls can setup appropriate state for the
+   reverse flow as well.  The Token Descriptor ID is 0x03, which might
+   represent a registered value for firewall tokens.
 
 
 
@@ -673,9 +673,6 @@ Yiakoumis               Expires November 8, 2020               [Page 12]
 
 Internet-Draft                networktokens                     May 2020
 
-
-   ID is 0x03, which might represent a registered value for firewall
-   tokens.
 
    The JWT encodes the following object.
 
@@ -692,14 +689,14 @@ Internet-Draft                networktokens                     May 2020
 
 {"sub":"The Godfather App", "iat":1588116732, "exp":1588117732,"bip":"140.54.35.194"}
 
-   The token is created by the app provider.  It states that this flow
-   originates from "The Godfather App", along with the time that it was
-   created and when it expires.  The token is signed with the app
-   provider's public key, and any network can verify this through the
-   attached signature.  The token is also bound to a specific IP
-   address, and therefore cannot be reused in a different context.  For
-   example, the application provider could configure all exit gateways
-   to attach a token for all outgoing flows.
+   The token is created by the application provider.  It states that
+   this flow originates from "The Godfather App", along with the time
+   that it was created and when it expires.  The token is signed with
+   the app provider's public key, and any network can verify this
+   through the attached signature.  The token is also bound to a
+   specific IP address, and therefore cannot be reused in a different
+   context.  For example, the application provider could configure all
+   exit gateways to attach a token for all outgoing flows.
 
 6.2.  Low-latency Token
 
@@ -713,14 +710,17 @@ Internet-Draft                networktokens                     May 2020
 
    The Reflect Type is 0x1, i.e., peers should reflect the token to
    setup state for the reverse flow.  The Token Descriptor ID is 0x01,
-   stating that the token payload is a JWT object.
+   stating that the token payload is encoded as a JWT object.
 
    The header of the JWT has the following fields:
 
    {'alg':'dir','enc':"A256CBC-HS512", 'app_id':14098715987234}
 
    The token is generated by the operator, and signed with the AES-256
-   algorith, using a customer-specific symmetric key.  The app_id points
+   algorith, using an operator's symmetric key.  The app_id points to an
+   operator-specific identifier associated with its own services.
+
+
 
 
 
@@ -730,21 +730,19 @@ Yiakoumis               Expires November 8, 2020               [Page 13]
 Internet-Draft                networktokens                     May 2020
 
 
-   is a local identifier, that the operator has associated with its own
-   services.
-
    The payload of the token has the following fields, requesting for
    low-latency treatment, and bounding the start and end time of the
    token.  It also has a unique identifier to allow revocation.
 
- {'srv':'lowlatency', 'nti': 5871234, iat':1588116732, 'exp':1588203132}
+{'srv':'lowlatency', 'msisdn':'+4151111111111', 'nti': 5871234, iat':1588116732, 'exp':1588203132}
 
    Each token is valid for 24 hours.  As the encryption key is bound to
-   a specific user, it cannot be used by another context.  The Operating
-   System (or an agent) in the user's device can request a token, and
-   grant it to specific applications based on a user's request.  Users
-   can revoke access by telling an operator to blacklist the nti
-   associated with this token.
+   a specific user, it cannot be used by another context.  The token is
+   opaque to everyone other than the operator (including the user).  The
+   Operating System (or an agent) in the user's device can request a
+   token, and grant it to specific applications based on a user's
+   request.  Users can revoke access by telling an operator to blacklist
+   the nti associated with this token.
 
    Besides accessing a low-latency service, this token serves two
    requirements: * it is application agnostic and can be used for any
@@ -772,11 +770,13 @@ Internet-Draft                networktokens                     May 2020
 
    o  Protocols that use a checksum over transmitted data (like TLS or
       optionally STUN) ensure that a token cannot be tampered or removed
-      by intermediary nodes
+      by intermediary nodes without the endpoints noticing it
 
    o  Implementations should also consider whether the protocol
       guarantees that a token is contained in a single packet or might
       be carried over multiple packets.
+
+
 
 
 
@@ -1069,7 +1069,7 @@ Internet-Draft                networktokens                     May 2020
    reflected by peers on the reverse flow.  This section discusses
    common consideration.
 
-8.1.  Network Token contents
+8.1.  Contents
 
    When deciding the contents of a token, applications should take
    effort to include only the necessary information and keep the size of
@@ -1083,12 +1083,12 @@ Internet-Draft                networktokens                     May 2020
    user-specific token by a another user, a token might be bound to a
    user identifier that the network can separately verify while
    processing packets and tokens (e.g., a well-defined IP address or an
-   IMSI in case of a cellular network).
+   MSISDN in case of a cellular network).
 
-8.2.  Network Token protocol
+8.2.  Encapsulating protocol
 
    This specification describes three protocols where tokens might be
-   inserted, and it is expected that this list will grow
+   inserted, and it is expected that this list will grow.
 
    IPv6 tokens sit at the narrow waist, can be applied to any traffic,
    and support both per-packet and per-flow granularity.  IPv6 tokens
@@ -1135,7 +1135,7 @@ Internet-Draft                networktokens                     May 2020
 8.3.  Network Token granularity
 
    The granularity of a token is either per-packet or per-flow and is
-   interconnected with the protocol where tokens are inserted.  The
+   colsely related with the protocol where tokens are inserted.  The
    trade-offs for each option are discussed below.
 
 8.3.1.  Per-packet granularity
@@ -1148,7 +1148,7 @@ Internet-Draft                networktokens                     May 2020
 
    On the other hand, per-packet granularity limits potential
    encapsulating protocols.  From the protocols described in this
-   specification only IPv6 allows per-packet granularity,
+   specification only IPv6 allows per-packet granularity.
 
    Per-packet granularity implies that all packet processing will
    involve cryptographic functions which might be expensive (or
@@ -1167,7 +1167,7 @@ Internet-Draft                networktokens                     May 2020
    The main disadvantage of per-flow granularity is that it requires
    per-flow state.  As policy enforcement depends on this state, per-
    flow granularity also requires that all packets of this flow will get
-   routed through this node.
+   routed through the node that interprets tokens.
 
 
 
