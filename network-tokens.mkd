@@ -36,7 +36,7 @@ informative:
 
 --- abstract
 
-Network Tokens is a method to securely transfer claims between endpoints and a network to drive or assist network policy. They are inserted by endpoints in existing protocols, interpreted by trusted networks, and may be signed or encrypted to meet security and privacy requirements. Network Tokens can be represented as JSON Web Tokens, CBOR Web Tokens, or other available formats. They can be used to expose and access a variety of network services such as firewall whitelists, QoS, and zero-rating services.
+Network Tokens is a method to securely transfer claims between endpoints and a network to drive or assist network policy. They are inserted by endpoints in existing protocols, interpreted by trusted networks, and may be signed or encrypted to meet security and privacy requirements. Network Tokens can be represented as JSON Web Tokens, CBOR Web Tokens, or other available formats. They can be used to expose and access a variety of datapath network services such as firewall whitelists, QoS, and zero-rating services.
 
 --- middle
 
@@ -106,7 +106,7 @@ As a result, DiffServ is better suited as an internal marking mechanism, categor
 
 Deep Packet Inspection uses predefined application signatures to detect traffic of interest, and then enforces the desired policy. Application signatures are a combination of IP addresses, domain names, SSL certificates, and other fields, that infer the application that generated traffic by implicitly observing traffic between endpoints. They are widely deployed today as an enabler for traffic differentiation services. 
 
-There are a few shortcomings associated with this. 
+The advantage of DPI is that it requires no changes from endpoints. But as new usecases come-up, applications grow in complexity, and privacy or net neutrality requirements strengthen, its shortcomings become more dominiant. 
 
 * Modern applications use a variety of protocols and architectures, integrate third-party services, establish connectivity through thousands of nodes, and constantly change. Maintaining application signatures requires frequent updates, involves manual interactions, cannot cover third-party traffic scenarios, and can therefore be inaccurate and expensive. 
 
@@ -116,44 +116,57 @@ There are a few shortcomings associated with this.
 
 * New privacy-enabling protocols (like DNS over HTTPS and Encrypted SNI) encrypt the last bits of cleartext information sent over the internet, further limiting DPI-based application detection.
 
-## Integration overhead
+## Requirements and Challenges
 
-## Implementing user-centric control
+### Integration overhead
 
-## Privacy
+Network services often require coordination between a network operator and an application provider. For example, firewall whitelists and zero-rating programs require the coordination between networks and the applications to be whitelisted (or zero-rated). It is typical for such programs to include a large and growing number of applications, and the integration process and mapping interface matters a lot, as it dictates the required effort for both networks and application providers. 
 
-## Detection Accuracy
+Network operators want to streamline the onboarding process for new applications in their programs, and also minimize the overhead to keep these integrations functional and accurate. Network tokens enable operators to onboard new applications just by granting them a new token and doesn't impose overhead to create, evaluate, and maintain app signatures. A token-based approach also decouples integration from the architecture of an application provider, meaning that there is no need for updates and maintenance every time an application partner changes its infrastructure. 
 
-## Fraud
+Decoupling integration from an application's infrastructure is important for the provider's side as well. They don't have to pace deployment of new servers to give partnering neteworks advance warning to update their DPI, and they can still leverage a network's services even when they don't own a server or when the traffic is originating from a third-party service. Another benefit for application providers is control. Tokens give application providers the capability to decide when and how to use related services, so they can offer it only to a subset of their users, for a limited period, or run A/B experiments without any infrastructure overhead and without further coordination with the network. Network tokens impose a trade-off for application providers, as they have to incorporate them into their offerings. 
 
+Regulatory requirements may dictate that zero-rating programs or other specialized services are available to a large number of application providers. For example many zero-rating programs are required to onboard all applications in a category. Network tokens offer a straight-forward and low overhead onboarding process, and make it easier to keep implementations compliant. Regulators may also have to monitor commercial practices for compliance, and therefore auditability becomes important. With network tokens, audits need to only check token distribution, which can be as simple as a database with when an application asked for a token, and when this was granted. 
 
-{::comment}
+### Detection Accuracy
 
-Network differentiation services involve multiple stakeholders. This section discusses the different perspectives and requirements. 
+Detection accuracy captures what percentage of traffic that falls under a policy gets eventually detected and treated accordingly by the network. It is one of the main criteria used during a zero-rating integration, and where most problems appear, as many applications use third-party traffic that cannot be properly accounted for (like ads or social media add-ons), and application backend changes are not properly communicated to or acted upon by the network operator. 
 
-## Use case for network operators
+Many integrations do not happen just because of inaccuracy reasons, when this falls below a threshold, causing issues for both application providers and operators. In other cases, application providers might have to change the functionality for such integrations to happen (e.g., disable ads). 
 
-A network operator needs to coordinate with end users and application providers to properly maintain its offered services. 
+Once an integration is established, failing to detect traffic may lead to uninteded charges for users and dissatisfaction. Operators have to retroactively perform troubleshooting, deal with customer support, and issue refunds. 
 
-A key requirement is the ability to launch such services and onboard users and application providers quickly and with low cost, and keep maintainance overhead low in order to maximize the potential benefits and reduce related costs.
+Inaccuracies also pose a trade-off for regulators: if detection inaccuracies are accepted, plan transparency issues arise (e.g., users might get charged for use of an applications that is promoted as free). In contrast, when inaccuracies are not allowed, many eligible applications cannot participate, thus raising issues about the openness of such programs. 
 
-Another important requirement is to ensure that only intended traffic gets special treatment, preventing inaccuracies and fraud. In zero-rating services for example, inaccuracies might lead to erroneous charges for users, and fraud in lost revenue. 
+Network tokens are decoupled from an application's backend and can also be applied to third-party traffic, giving application developers the capability to improve accuracy without affecting the functionality of their apps. 
 
-Network tokens can serve both requirements above, as they provide a deterministic, secure, and verifiable method for networks to identify traffic of interest, with no additional overhead per-application or user. 
+### Fraud
 
-Lastly, operators need to comply with the regulatory guidelines around privacy and net neutrality, as discussed in the section below. 
+Malicious users may exploit limitations in traffic detection and get special treatment from the network. This often happens in zero-rating services, where malicious users setup a proxy server, connect to it using the properties (e.g., SNI) of an otherwise zero-rated application, and essentially zero-rate all their traffic. 
 
-## Use case for regulators
+When fraud happens it leads to lost revenue for network operators. To prevent fraud, some operators require that application signatures use only IP addresses, which are harder for bad actors to spoof. This in turn makes integration harder. Many application providers use CDNs that share IP addresses across multiple applications, and they become ineligible to participate. Others that do have their own IP addresses, can still integrate but at the cost of more frequent updates whenever as new servers (and IP addresses) are added. 
 
-Traffic differentiation services like zero-rating and QoS are often the subject of net neutrality regulation. As regulators come up with certain requirements for how such services should be offered, implementation in the network will dictate the expected level of compliance, and therefore is an important part to consider. 
-
-A regulator might require that all traffic from a certain category receives the same treatment, a common approach for zero-rating services in several countries. Alternatively, a regulator may require such services to be application agnostic and driven by users. 
-
-Another consideration for telecom regulators is around privacy. 
-
-{:/comment}
+Network tokens deal with fraud through signed tokens that can be integrity protected and resistant to replay and spoofing attacks. 
 
 
+### Implementing user-centric control
+
+One particular instance for traffic differentiation services (and particular QoS services) is user-centric control. This is  be imposed for business and regulatory reasons, and is equally important for network operators, regulators, and end-users. 
+
+Network tokens provide the means to put users in charge of QoS treatment. 
+User-specific tokens can be applied to traffic directly, or given to applications after user consent, and be revoked at any time, similar with OATH2 authentication workflows. They can be used in an application agnostic manner, and don't require network operators to limit their offerings to specific applications. 
+
+Moreover, tokens require explicit action, are verifiable, and prevent abuse from third parties, which are necessary properties to build network services that involve charging and accounting. 
+
+### Privacy
+
+Privacy is often at odds with traffic differentiation services, especially when networks have to inspect a user's traffic to enforce a service, and/or this happens without a user's consent. Regulation around privacy, increased user awareness, as well as emerging protocols like Encrypted SNI and DNS over HTTPS requireTokens can address such concerns in a number of ways. 
+
+Coupled with user-centric control, network operators can expose datapath services in an application agnostic manner and respect user privacy. They do not have to detect use of specific applications at all, all necessary information is included within a token, and users explicitly share relevant information with the network. 
+
+Network tokens can also promote privacy for application-based network services. Today, if one network can detect an application (e.g., through the use of SNI), every other network can as well. Using network tokens, the application provider (or user) can share this context only with trusted networks, keeping traffic largely opaque for other networks. 
+
+As protocols like ESNI and DoH emerge, network tokens enable application providers to adopt them, and at the same time integrate with trusted networks. Respectively, they can enable network operators to expose traffic differentiation services, even when traffic is largely opaque to them. 
 
 {::comment}
 
@@ -171,7 +184,14 @@ The distribution of tokens is out of scope for this document.
 
 {:/comment}
 
-# Contents and Representation
+# Representation
+
+Network tokens can be represented in different formats. For example, a network operator might structure a token as a pre-defined byte sequence or a list of TLV-encoded fields. Alternatively, tokens can use existing JOSE and COSE technologies for representation, as they already provide a framework to securely communicate information between different entities. The actual representation and contents of a token should take into consideration the capabilities of the network to process them (i.e, what cryptographic functionality can the network support), the token's length in terms of header space, and requirements for integrity protection, privacy preservation, and attack scenarios. 
+
+Examples in this document will use JWT to represent tokens, as they are well understood by the community and easily read by humans. Translation to a different representation format should be straight forward. 
+
+
+# Contents
 
 The contents of a network token fulfil three main goals:
 
@@ -179,9 +199,6 @@ The contents of a network token fulfil three main goals:
 * prevent unauthorized parties from replaying or using these tokens to inadvertently access network services (e.g., through the use of timestamps, expiration time, nonces)
 * digitally sign and/or encrypt a token to meet privacy and security requirements
 
-Network operators can define their own structure to represent tokens, for example through pre-defined byte sequences or a list of TLV-encoded fields. Alternatively, tokens can use JOSE and COSE technologies for representation, as they already provide a framework to securely communicate information between different entities. The actual representation and contents of a token should take into consideration the capabilities of the network to process them (i.e, what cryptographic functionality can the network support), length in terms of header space, and requirements for integrity protection, privacy preservation, and attack scenarios. 
-
-Examples in this document will use JWT to represent tokens, as they are well understood by the community and easily read by humans. Translation to a different representation format should be straight forward. 
 
 ## Network Token Common fields
 
@@ -220,7 +237,7 @@ The "nti" field provides a nonce-like value for the token. The identifier value 
 
 The "bip" (Bound IP) field bounds the use of the token to a specific IP address. This can prevent third parties from reusing the token in a different context.  
 
-## Network Token Format
+# Network Token Format
 
 A token consists of the following fields (Figure X):
 
