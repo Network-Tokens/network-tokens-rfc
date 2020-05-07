@@ -4,8 +4,8 @@
 
 TBD                                                         Y. Yiakoumis
 Internet-Draft                                      Selfie Networks, Inc
-Intended status: Informational                            April 13, 2020
-Expires: October 15, 2020
+Intended status: Standards Track                            May 07, 2020
+Expires: November 8, 2020
 
 
                              Network Tokens
@@ -37,7 +37,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on October 15, 2020.
+   This Internet-Draft will expire on November 8, 2020.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Yiakoumis               Expires October 15, 2020                [Page 1]
+Yiakoumis               Expires November 8, 2020                [Page 1]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
    include Simplified BSD License text as described in Section 4.e of
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Yiakoumis               Expires October 15, 2020                [Page 2]
+Yiakoumis               Expires November 8, 2020                [Page 2]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
      10.4.  STUN Attributes Registry . . . . . . . . . . . . . . . .  24
@@ -165,9 +165,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020                [Page 3]
+Yiakoumis               Expires November 8, 2020                [Page 3]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
    uninterpretable by everyone other than the operator (including the
@@ -221,9 +221,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020                [Page 4]
+Yiakoumis               Expires November 8, 2020                [Page 4]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
 2.1.  Existing mechanisms
@@ -277,9 +277,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020                [Page 5]
+Yiakoumis               Expires November 8, 2020                [Page 5]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
    o  Modern applications use a variety of protocols and architectures,
@@ -333,9 +333,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020                [Page 6]
+Yiakoumis               Expires November 8, 2020                [Page 6]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
    originating from a third-party service.  Another benefit for
@@ -389,9 +389,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020                [Page 7]
+Yiakoumis               Expires November 8, 2020                [Page 7]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
    eligible applications cannot participate, thus raising issues about
@@ -445,9 +445,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020                [Page 8]
+Yiakoumis               Expires November 8, 2020                [Page 8]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
 2.2.5.  Privacy
@@ -501,9 +501,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020                [Page 9]
+Yiakoumis               Expires November 8, 2020                [Page 9]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
 4.  Contents
@@ -557,9 +557,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 10]
+Yiakoumis               Expires November 8, 2020               [Page 10]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
    used to reduce the probability of replay attacks, restrict service
@@ -613,9 +613,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 11]
+Yiakoumis               Expires November 8, 2020               [Page 11]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
       they are in control of the part of the namespace they use (e.g.,
@@ -669,9 +669,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 12]
+Yiakoumis               Expires November 8, 2020               [Page 12]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
    ID is 0x03, which might represent a registered value for firewall
@@ -725,9 +725,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 13]
+Yiakoumis               Expires November 8, 2020               [Page 13]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
    is a local identifier, that the operator has associated with its own
@@ -781,9 +781,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 14]
+Yiakoumis               Expires November 8, 2020               [Page 14]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
    This section discusses the use of tokens in three widely used
@@ -837,9 +837,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 15]
+Yiakoumis               Expires November 8, 2020               [Page 15]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
 3900e3  # Network Token Extension with 227 bytes length
@@ -893,9 +893,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 16]
+Yiakoumis               Expires November 8, 2020               [Page 16]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
    The TLS handshake is protected for message integrity, and as such
@@ -949,9 +949,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 17]
+Yiakoumis               Expires November 8, 2020               [Page 17]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
 001F00e3  # Network Token Extension with 227 bytes length
@@ -1005,9 +1005,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 18]
+Yiakoumis               Expires November 8, 2020               [Page 18]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
 1f1d  # Network Token Hop-by-Hop option with 29 8-octet length
@@ -1061,9 +1061,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 19]
+Yiakoumis               Expires November 8, 2020               [Page 19]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
    reflected by peers on the reverse flow.  This section discusses
@@ -1117,9 +1117,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 20]
+Yiakoumis               Expires November 8, 2020               [Page 20]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
    availability of tokens in different protocols, and the capability of
@@ -1173,9 +1173,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 21]
+Yiakoumis               Expires November 8, 2020               [Page 21]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
 8.4.  Token to DiffServ mapping and reflection
@@ -1229,9 +1229,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 22]
+Yiakoumis               Expires November 8, 2020               [Page 22]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
 10.  IANA Considerations { #iana }
@@ -1285,9 +1285,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 23]
+Yiakoumis               Expires November 8, 2020               [Page 23]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
    o  Description: Network Token
@@ -1341,9 +1341,9 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 24]
+Yiakoumis               Expires November 8, 2020               [Page 24]
 
-Internet-Draft                networktokens                   April 2020
+Internet-Draft                networktokens                     May 2020
 
 
    [RFC7519]  Jones, M., Bradley, J., and N. Sakimura, "JSON Web Token
@@ -1397,4 +1397,4 @@ Author's Address
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 25]
+Yiakoumis               Expires November 8, 2020               [Page 25]

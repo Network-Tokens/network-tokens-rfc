@@ -2,8 +2,8 @@
 title: Network Tokens
 abbrev: networktokens
 docname: draft-yiakoumis-network-tokens-00
-date: 2020-04-13
-category: info
+date: 2020-05-07
+category: std
 
 ipr: trust200902
 area: General
