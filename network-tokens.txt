@@ -913,14 +913,14 @@ Internet-Draft                networktokens                     May 2020
    that belong to this flow.
 
    The token comprises the attribute data.  Section {#iana} requests the
-   value 0x001F as a Network Token STUN attribute.  The following
+   value 0x8030 as a Network Token STUN attribute.  The following
    bytestream shows the attribute for the low-latency token described
    earlier, including attribute type and length.
 
    (TODO: We need to deal with padding here as STUN requires 32-bit
    boundaries.)
 
-001F00e3  # Network Token Attribute with 227 bytes length
+803000e3  # Network Token Attribute with 227 bytes length
 1000001 # Network token is represented as JWT, reflect at node
 65794a68624763694f694a6b615849694c434a6c626d4d694f694a424d6a553251304a444c556
 8544e544579496e302e2e565f4278546d4e692d6b6337735a376b504e514851412e5a42764269
@@ -954,7 +954,7 @@ Yiakoumis               Expires November 8, 2020               [Page 17]
 Internet-Draft                networktokens                     May 2020
 
 
-001F00e3  # Network Token Extension with 227 bytes length
+803000e3  # Network Token Extension with 227 bytes length
 2000001 # Network token is represented as JWT, reflected token
 65794a68624763694f694a6b615849694c434a6c626d4d694f694a424d6a553251304a444c556
 8544e544579496e302e2e565f4278546d4e692d6b6337735a376b504e514851412e5a42764269
@@ -1307,10 +1307,10 @@ Internet-Draft                networktokens                     May 2020
 
 10.4.  STUN Attributes Registry
 
-   This section registers the value 0x001F as a STUN attribute for
+   This section registers the value 0x8030 as a STUN attribute for
    network tokens.
 
-   o  Value: 0x001F
+   o  Value: 0x8030
 
    o  Description: Network Token
 

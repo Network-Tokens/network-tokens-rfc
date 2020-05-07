@@ -418,12 +418,12 @@ Network tokens can be inserted as attributes in STUN Binding Request and Binding
 
 Network tokens used as STUN attributes are flow-specific, i.e., the network should apply the policy linked to this token to all packets that belong to this flow. 
 
-The token comprises the attribute data. Section {#iana} requests the value 0x001F as a Network Token STUN attribute. The following bytestream shows the attribute for the low-latency token described earlier, including attribute type and length. 
+The token comprises the attribute data. Section {#iana} requests the value 0x8030 as a Network Token STUN attribute. The following bytestream shows the attribute for the low-latency token described earlier, including attribute type and length. 
 
 (TODO: We need to deal with padding here as STUN requires 32-bit boundaries.)
 
 ~~~
-001F00e3  # Network Token Attribute with 227 bytes length
+803000e3  # Network Token Attribute with 227 bytes length
 1000001 # Network token is represented as JWT, reflect at node
 65794a68624763694f694a6b615849694c434a6c626d4d694f694a424d6a553251304a444c556
 8544e544579496e302e2e565f4278546d4e692d6b6337735a376b504e514851412e5a42764269
@@ -441,7 +441,7 @@ The token comprises the attribute data. Section {#iana} requests the value 0x001
 If the reflect type is set to 0, the peer takes no additional step. If reflect type is 0x1, the peer should attach a Network Token request at the Binding Response message, set the type to 0x2, and copy the rest of the token in it. The attribute data for the Binding Response message that reflects the token mentioned above is listed below.
 
 ~~~
-001F00e3  # Network Token Extension with 227 bytes length
+803000e3  # Network Token Extension with 227 bytes length
 2000001 # Network token is represented as JWT, reflected token
 65794a68624763694f694a6b615849694c434a6c626d4d694f694a424d6a553251304a444c556
 8544e544579496e302e2e565f4278546d4e692d6b6337735a376b504e514851412e5a42764269
@@ -612,9 +612,9 @@ This section registers the value 57 as a TLS Extension Type for network tokens.
 
 ## STUN Attributes Registry
 
-This section registers the value 0x001F as a STUN attribute for network tokens. 
+This section registers the value 0x8030 as a STUN attribute for network tokens. 
 
-* Value: 0x001F
+* Value: 0x8030
 * Description: Network Token
 * Reference: This document
 
