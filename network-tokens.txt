@@ -65,47 +65,47 @@ Internet-Draft                networktokens                   April 2020
 Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
-   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
-   3.  Motivation  . . . . . . . . . . . . . . . . . . . . . . . . .   3
-   4.  Network Token Overview  . . . . . . . . . . . . . . . . . . .   3
-   5.  Contents and Representation . . . . . . . . . . . . . . . . .   4
-     5.1.  Network Token Common fields . . . . . . . . . . . . . . .   5
-       5.1.1.  'iss' (Issuer) field  . . . . . . . . . . . . . . . .   5
-       5.1.2.  "sub" (Subject) field . . . . . . . . . . . . . . . .   5
-       5.1.3.  "exp" (Expiration Time) field . . . . . . . . . . . .   5
-       5.1.4.  "iat" (Issued At) field . . . . . . . . . . . . . . .   6
-       5.1.5.  "nti" field (Network Token ID) field  . . . . . . . .   6
-       5.1.6.  "bip" field (Bound IP) field  . . . . . . . . . . . .   6
-     5.2.  Network Token Format  . . . . . . . . . . . . . . . . . .   6
-   6.  Example Network Tokens  . . . . . . . . . . . . . . . . . . .   7
-     6.1.  Firewall Whitelist Token  . . . . . . . . . . . . . . . .   7
-     6.2.  Low-latency Token . . . . . . . . . . . . . . . . . . . .   8
-   7.  Network Tokens and Encapsulating protocols  . . . . . . . . .   9
-     7.1.  Network Tokens as a TLS Extension . . . . . . . . . . . .  10
-     7.2.  Network Tokens as a STUN Attribute  . . . . . . . . . . .  11
-     7.3.  Network Tokens as an IPv6 Hop-by-Hop Extension Header . .  13
-   8.  Implementation Considerations . . . . . . . . . . . . . . . .  14
-     8.1.  Network Token contents  . . . . . . . . . . . . . . . . .  14
-     8.2.  Network Token protocol  . . . . . . . . . . . . . . . . .  15
-     8.3.  Network Token granularity . . . . . . . . . . . . . . . .  15
-       8.3.1.  Per-packet granularity  . . . . . . . . . . . . . . .  16
-       8.3.2.  Per-flow granularity  . . . . . . . . . . . . . . . .  16
-     8.4.  Token to DiffServ mapping and reflection  . . . . . . . .  16
-   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  17
-   10. IANA Considerations { #iana } . . . . . . . . . . . . . . . .  17
-     10.1.  Token Descriptor ID Registry . . . . . . . . . . . . . .  17
-       10.1.1.  Initial Registry Contents  . . . . . . . . . . . . .  18
-     10.2.  IPv6 Hop-By-Hop options registration . . . . . . . . . .  18
-     10.3.  TLS ExtensionType Registry . . . . . . . . . . . . . . .  18
-     10.4.  STUN Attributes Registry . . . . . . . . . . . . . . . .  18
-   11. References  . . . . . . . . . . . . . . . . . . . . . . . . .  19
-     11.1.  Normative References . . . . . . . . . . . . . . . . . .  19
-     11.2.  Informative References . . . . . . . . . . . . . . . . .  20
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  20
-
-
-
-
+     1.1.  Network Token Overview  . . . . . . . . . . . . . . . . .   3
+   2.  Motivation  . . . . . . . . . . . . . . . . . . . . . . . . .   4
+     2.1.  Existing mechanisms . . . . . . . . . . . . . . . . . . .   5
+       2.1.1.  DiffServ  . . . . . . . . . . . . . . . . . . . . . .   5
+       2.1.2.  Deep Packet Inspection  . . . . . . . . . . . . . . .   5
+     2.2.  Integration overhead  . . . . . . . . . . . . . . . . . .   6
+     2.3.  Implementing user-centric control . . . . . . . . . . . .   6
+     2.4.  Privacy . . . . . . . . . . . . . . . . . . . . . . . . .   6
+     2.5.  Detection Accuracy  . . . . . . . . . . . . . . . . . . .   6
+     2.6.  Fraud . . . . . . . . . . . . . . . . . . . . . . . . . .   6
+   3.  Contents and Representation . . . . . . . . . . . . . . . . .   6
+     3.1.  Network Token Common fields . . . . . . . . . . . . . . .   7
+       3.1.1.  'iss' (Issuer) field  . . . . . . . . . . . . . . . .   7
+       3.1.2.  "sub" (Subject) field . . . . . . . . . . . . . . . .   7
+       3.1.3.  "exp" (Expiration Time) field . . . . . . . . . . . .   7
+       3.1.4.  "iat" (Issued At) field . . . . . . . . . . . . . . .   8
+       3.1.5.  "nti" field (Network Token ID) field  . . . . . . . .   8
+       3.1.6.  "bip" field (Bound IP) field  . . . . . . . . . . . .   8
+     3.2.  Network Token Format  . . . . . . . . . . . . . . . . . .   8
+   4.  Example Network Tokens  . . . . . . . . . . . . . . . . . . .   9
+     4.1.  Firewall Whitelist Token  . . . . . . . . . . . . . . . .   9
+     4.2.  Low-latency Token . . . . . . . . . . . . . . . . . . . .  10
+   5.  Network Tokens and Encapsulating protocols  . . . . . . . . .  11
+     5.1.  Network Tokens as a TLS Extension . . . . . . . . . . . .  12
+     5.2.  Network Tokens as a STUN Attribute  . . . . . . . . . . .  13
+     5.3.  Network Tokens as an IPv6 Hop-by-Hop Extension Header . .  15
+   6.  Implementation Considerations . . . . . . . . . . . . . . . .  16
+     6.1.  Network Token contents  . . . . . . . . . . . . . . . . .  16
+     6.2.  Network Token protocol  . . . . . . . . . . . . . . . . .  17
+     6.3.  Network Token granularity . . . . . . . . . . . . . . . .  17
+       6.3.1.  Per-packet granularity  . . . . . . . . . . . . . . .  18
+       6.3.2.  Per-flow granularity  . . . . . . . . . . . . . . . .  18
+     6.4.  Token to DiffServ mapping and reflection  . . . . . . . .  18
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  19
+   8.  IANA Considerations { #iana } . . . . . . . . . . . . . . . .  19
+     8.1.  Token Descriptor ID Registry  . . . . . . . . . . . . . .  19
+       8.1.1.  Initial Registry Contents . . . . . . . . . . . . . .  20
+     8.2.  IPv6 Hop-By-Hop options registration  . . . . . . . . . .  20
+     8.3.  TLS ExtensionType Registry  . . . . . . . . . . . . . . .  20
+     8.4.  STUN Attributes Registry  . . . . . . . . . . . . . . . .  20
+   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  21
 
 
 
@@ -114,54 +114,54 @@ Yiakoumis               Expires October 15, 2020                [Page 2]
 Internet-Draft                networktokens                   April 2020
 
 
+     9.1.  Normative References  . . . . . . . . . . . . . . . . . .  21
+     9.2.  Informative References  . . . . . . . . . . . . . . . . .  22
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  22
+
 1.  Introduction
 
-   This specifications motivates and describes network tokens, a method
-   to securely transfer clams between endpoints and a network to drive
-   and/or assiste network policy.
+   This specification motivates and describes network tokens, a method
+   for endpoints to explicitly coordinate with networks about how their
+   traffic is treated.  They provide a means for networks to expose
+   datapath services, and for end users to access such services by
+   appropriately tagging their traffic.  Network tokens are intended for
+   scenarios where there is explicit coordination and trust between
+   endpoints and the network, like a zero-rating service, a user-driven
+   QoS service, or a firewall whitelist.
 
-   The JSON Web Token (JWT) [RFC7519] and CBOR Web Token (CWT) [RFC8392]
-   are standardized security token formats that have found use in OAuth
-   2.0, OpenID Connect, and Internet of Things deployments, among other
-   applications.  JWT and CWT use JSON Object Signature and Encryption
-   (JOSE) and COBR Object Signature and Encryption (COSE) technologies
-   to secure the contents of tokens, which essentially are a set of
-   claims represented in JSON or CBOR.
-
-   This specification motivates and describes the use of tokens - named
-   network tokens - as a method to securely transfer claims between
-   endpoints and a network to drive and/or assist network policy.
-   Network tokens are inserted by endpoints in existing protocols,
-   interpreted by trusted networks, and may be signed or encrypted to
-   meet a variety of security and privacy requirements.  They can be
-   encoded as JSON Web Tokens, CBOR Web Tokens, or other available
-   formats.  Network tokens can be used to expose and access a variety
-   of network services such as firewall whitelists, QoS, and zero-rating
-   services.
-
-2.  Terminology
-
-   o  End Users: We use the term "end user" to broadly characterize a
-      role that has control over an endpoint.  This can be an individual
-      user, an enterprise, an Operating System, or an application.
-
-3.  Motivation
-
-   o  Discuss existing alternatives through DiffServ and DPI
-
-   o  Requirements from different perspectives (network operator,
-      regulator, app developer, user)
-
-4.  Network Token Overview
+1.1.  Network Token Overview
 
    A network token is a small piece of data that end users attach to
-   their packets to access a whitelist-based network service.  As
-   packets flow through the network, intermediate nodes detect tokens,
-   interpret them, and apply the desired service to the packets that
-   carry them (and possibly to all other packets from the same flow).
+   their packets.  As packets flow through the network, intermediate
+   nodes MAY detect tokens, interpret them, and apply the desired
+   service to the packets that carry them (and possibly to all other
+   packets from the same flow).
 
-   Network tokens are always interpreted by a network operator.  Token
-   generation depends on the use case and trust relationship between the
+   Tokens MAY be digitally signed, integrity protected and/or encrypted
+   to account for privacy and security, and can be provisioned to
+   prevent replay and spoofing attacks.
+
+   Tokens are policy-agnostic, i.e., they just provide a unified
+   mechanism to communicate and interpret certain claims in the
+   datapath.  Network services built using tokens can dictate the
+   desired policy through token (or token metadata) distribution, and
+   the cryptographic functions applied to them.
+
+   For example, A firewall whitelist token would state the name of the
+   application to be whitelisted, be signed with the private key of the
+   application provider, and could be interpreted and verified by anyone
+   with the application provider's public key.  It may also be bound to
+   the IP address of the application provider's server that generates
+   the traffic so it cannot be used in a different context.
+
+   Similarly, a token for a user-driven, application-agnostic, and
+   privacy-preserving low-latency service will hold a unique user
+   identifier (like an MSISDN), the keyword "lowlatency", an expiration
+   date, a nonce for revocability, and will be encrypted with a network
+   operator's secret key.  The contents of the token will be opaque and
+   uninterpretable by everyone other than the operator (including the
+   user).
+
 
 
 
@@ -170,31 +170,146 @@ Yiakoumis               Expires October 15, 2020                [Page 3]
 Internet-Draft                networktokens                   April 2020
 
 
-   different entities involved.  For example, tokens might be generated
-   by the network who distributes it to eligible end-users on-demand.
-   Alternatively, the operator can enable users to generate multiple
-   tokens themselves, or application providers might generate tokens and
-   tell operators how to interpret them.
-
-   To prevent unauthorized third-parties from replaying, spoofing, or
-   interpreting a token, tokens may be signed and encrypted, in ways
-   described below.  Network tokens can use custom or existing
-   representation formats, like JWT [RFC7515] or CWT [RFC7516].
-   Section XX discusses example tokens for specific usecases.
-
    Network tokens do not dictate a dedicated header or protocol to be
    inserted.  Instead, they are incorporated as options and extensions
-   into a variety of existing protocols.  For example, network tokens
-   can be carried as TLS Client and Server Hello extensions during a TLS
-   handshake, as IPv6 destination or Hop by Hop Options, or as
-   attributes during a STUN-enabled flow setup.  Network tokens are
-   largely opaque to the protocols that carry them.  Section XX
-   discusses implementation details for inserting tokens, and Section XX
-   lists recommended IANA registry changes for TLS, STUN, and IPv6.
+   into a variety of existing protocols.  For example, they can be
+   carried as TLS Client and Server Hello extensions during a TLS
+   handshake, as IPv6 Hop by Hop Options, or as attributes during a
+   STUN-enabled flow setup.  Network tokens are largely opaque to the
+   protocols that carry them.
 
-   The distribution of tokens is out of scope for this document.
+   Network tokens are inspired and derived by existing security tokens,
+   like JSON Web Token (JWT) [RFC7519] and CBOR Web Token (CWT)
+   [RFC8392].  In fact, network tokens MAY be represented as JWT and CWT
+   objects, and respectively use JOSE and COSE technologies for signing
+   and encryption.
 
-5.  Contents and Representation
+2.  Motivation
+
+   Network traffic differentiation is widely deployed in enterprise,
+   residential, and cellular networks.  Typical use cases are firewall
+   whitelists, zero-rating programs, and custom QoS SLAs where certain
+   traffic is granted special treatment.
+
+   A common concern for all such services is how to identify traffic of
+   interest in order to map it to (and enforce) the desired network
+   policy.  The mechanism that does this essentially becomes the
+   interface between networks, application providers and end-users, and
+   has direct implications to network management and security, user
+   privacy, business practices, and compliance with net neutrality
+   regulation.
+
+   Identifying traffic of interest is not straight forward, as it often
+   depends on context not present in the related packets themselves.
+   For example, the decision to allow a packet through a firewall or
+   zero-rating whitelist is based on the application that generated the
+   packet, while routing a flow through a low-latency path depends on
+   the desire of a user to prioritize this flow and potentially pay for
+   it.  Requirements around accountability and verification, fraud
+   prevention, privacy preservation, and compliance with net neutrality
+   regulation just make the task harder.
+
+   This section discusses existing mechanisms that map traffic to
+   network differentiation services, and then details some of the
+   challenges raised above through the perspective of multiple
+   stakeholders, and how network tokens can help to solve them.
+
+
+
+
+
+
+
+
+Yiakoumis               Expires October 15, 2020                [Page 4]
+
+Internet-Draft                networktokens                   April 2020
+
+
+2.1.  Existing mechanisms
+
+   The two primary methods that map traffic to network differentiation
+   services today are DiffServ and Deep Packet Inspection.
+
+2.1.1.  DiffServ
+
+   DiffServ allows endpoints to mark their packets (using the 6 DSCP
+   bits in the IP header) and map them to a specific class in the
+   network (e.g., high bandwidth, low latency).  Although widely
+   implemented in modern routers and operating systems, DiffServ has
+   certain limitations.  First, the limited set of DSCP bits supports
+   only 64 classes, and is already used internally by networks for their
+   own purposes, leaving little room for customization.  Using them
+   outside a single administrative domain would i) require all networks,
+   operating systems and applications to agree at a pre-defined meaning
+   for each DSCP code (which has been proven impractical), ii) expect
+   every element in the path to respect or at the very least not alter
+   the DSCP marking, and iii) require networks to use a different
+   mechanism for their own needs.
+
+   Second, and maybe most important, DiffServ has no authentication and
+   revocation primitives: any application can set the DSCP bits and
+   request service without the user's consent.  Any developer can ask
+   for special network treatment even if it conflicts with a user's
+   desire, or--even worse--if it results in network charges for users,
+   and users or operators do not have the means to easily revoke such
+   access.
+
+   As a result, DiffServ is better suited as an internal marking
+   mechanism, categorizing traffic into broad classes, and DiffServ bits
+   or often reset or ignored across network boundaries.
+
+2.1.2.  Deep Packet Inspection
+
+   Deep Packet Inspection uses predefined application signatures to
+   detect traffic of interest, and then enforces the desired policy.
+   Application signatures are a combination of IP addresses, domain
+   names, SSL certificates, and other fields, that infer the application
+   that generated traffic by implicitly observing traffic between
+   endpoints.  They are widely deployed today as an enabler for traffic
+   differentiation services.
+
+   There are a few shortcomings associated with this.
+
+   o  Modern applications use a variety of protocols and architectures,
+      integrate third-party services, establish connectivity through
+      thousands of nodes, and constantly change.  Maintaining
+
+
+
+Yiakoumis               Expires October 15, 2020                [Page 5]
+
+Internet-Draft                networktokens                   April 2020
+
+
+      application signatures requires frequent updates, involves manual
+      interactions, cannot cover third-party traffic scenarios, and can
+      therefore be inaccurate and expensive.
+
+   o  Application signatures are vulnerable to fraud, as bad actors can
+      spoof certain fields (like Server Name Identification) and pretend
+      they are eligible for preferential treatment.
+
+   o  Deep Packet Inspection policies are strictly linked with an
+      application.  This raises privacy concerns, as networks need to
+      know the application that traffic originates from in order to
+      enforce a policy.
+
+   o  New privacy-enabling protocols (like DNS over HTTPS and Encrypted
+      SNI) encrypt the last bits of cleartext information sent over the
+      internet, further limiting DPI-based application detection.
+
+2.2.  Integration overhead
+
+2.3.  Implementing user-centric control
+
+2.4.  Privacy
+
+2.5.  Detection Accuracy
+
+2.6.  Fraud
+
+3.  Contents and Representation
 
    The contents of a network token fulfil three main goals:
 
@@ -215,17 +330,16 @@ Internet-Draft                networktokens                   April 2020
    technologies for representation, as they already provide a framework
    to securely communicate information between different entities.  The
    actual representation and contents of a token should take into
-   consideration the capabilities of the network to process them (i.e,
-   what cryptographic functionality can the network support), length in
 
 
 
-
-Yiakoumis               Expires October 15, 2020                [Page 4]
+Yiakoumis               Expires October 15, 2020                [Page 6]
 
 Internet-Draft                networktokens                   April 2020
 
 
+   consideration the capabilities of the network to process them (i.e,
+   what cryptographic functionality can the network support), length in
    terms of header space, and requirements for integrity protection,
    privacy preservation, and attack scenarios.
 
@@ -234,7 +348,7 @@ Internet-Draft                networktokens                   April 2020
    Translation to a different representation format should be straight
    forward.
 
-5.1.  Network Token Common fields
+3.1.  Network Token Common fields
 
    Network tokens can have arbitrary fields (or claims).  The fields
    defined below, while not mandatory, provide a starting point for a
@@ -244,14 +358,14 @@ Internet-Draft                networktokens                   April 2020
    already registered as part of JWT and CWT specifications, while
    others are specific for network tokens.
 
-5.1.1.  'iss' (Issuer) field
+3.1.1.  'iss' (Issuer) field
 
    The "iss" (issuer) field identifies the principal that issued the
    token.  For example, the issuer might be the name of the network
    operator that offers the service of interest.  The processing of this
    claim is generally application specific.
 
-5.1.2.  "sub" (Subject) field
+3.1.2.  "sub" (Subject) field
 
    The "sub" (subject) field identifies the principal that is the
    subject of the token.  This could be a subscriber id, or the name of
@@ -259,7 +373,7 @@ Internet-Draft                networktokens                   April 2020
    locally unique in the context of the issuer or be globally unique.
    The processing of this claim is generally application specific.
 
-5.1.3.  "exp" (Expiration Time) field
+3.1.3.  "exp" (Expiration Time) field
 
    The "exp" (expiration time) field identifies the expiration time on
    or after which the token MUST NOT be accepted for processing.  The
@@ -275,20 +389,18 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-
-
-Yiakoumis               Expires October 15, 2020                [Page 5]
+Yiakoumis               Expires October 15, 2020                [Page 7]
 
 Internet-Draft                networktokens                   April 2020
 
 
-5.1.4.  "iat" (Issued At) field
+3.1.4.  "iat" (Issued At) field
 
    The "iat" (issued at) field identifies the time at which the token
    was issued or generated.  This field can be used to determine the age
    of the token, and can be used along or instead of the "exp" field.
 
-5.1.5.  "nti" field (Network Token ID) field
+3.1.5.  "nti" field (Network Token ID) field
 
    The "nti" field provides a nonce-like value for the token.  The
    identifier value MUST be assigned in a manner that ensures that there
@@ -298,13 +410,13 @@ Internet-Draft                networktokens                   April 2020
    different issuers as well.  The "nti" field can be used to prevent
    the token from being replayed.
 
-5.1.6.  "bip" field (Bound IP) field
+3.1.6.  "bip" field (Bound IP) field
 
    The "bip" (Bound IP) field bounds the use of the token to a specific
    IP address.  This can prevent third parties from reusing the token in
    a different context.
 
-5.2.  Network Token Format
+3.2.  Network Token Format
 
    A token consists of the following fields (Figure X):
 
@@ -333,7 +445,7 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020                [Page 6]
+Yiakoumis               Expires October 15, 2020                [Page 8]
 
 Internet-Draft                networktokens                   April 2020
 
@@ -361,12 +473,12 @@ Internet-Draft                networktokens                   April 2020
                         +-------------------------------+
 
 
-6.  Example Network Tokens
+4.  Example Network Tokens
 
    This section discusses example network tokens and how they can serve
    specific use cases.
 
-6.1.  Firewall Whitelist Token
+4.1.  Firewall Whitelist Token
 
    A firewall token can be used to whitelist traffic from trusted
    applications.
@@ -389,7 +501,7 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020                [Page 7]
+Yiakoumis               Expires October 15, 2020                [Page 9]
 
 Internet-Draft                networktokens                   April 2020
 
@@ -414,7 +526,7 @@ Internet-Draft                networktokens                   April 2020
    example, the application provider could configure all exit gateways
    to attach a token for all outgoing flows.
 
-6.2.  Low-latency Token
+4.2.  Low-latency Token
 
    A low-latency token is used to access a custom QoS SLA from a mobile
    operator tailored for video communications.  This is an application-
@@ -445,7 +557,7 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020                [Page 8]
+Yiakoumis               Expires October 15, 2020               [Page 10]
 
 Internet-Draft                networktokens                   April 2020
 
@@ -463,7 +575,7 @@ Internet-Draft                networktokens                   April 2020
    indication about specific applications, and no identifier that can be
    linked to a user.
 
-7.  Network Tokens and Encapsulating protocols
+5.  Network Tokens and Encapsulating protocols
 
    Network tokens are inserted in existing protocols by leveraging
    extension capabilities and do not require a dedicated header.  The
@@ -501,7 +613,7 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020                [Page 9]
+Yiakoumis               Expires October 15, 2020               [Page 11]
 
 Internet-Draft                networktokens                   April 2020
 
@@ -519,7 +631,7 @@ Internet-Draft                networktokens                   April 2020
 72e32556e32636a6f6a5267424f396349565f7869536d586357745a6e4535495475684973456a
 4f76726378472e3f9 # Network token payload (as JWE)
 
-7.1.  Network Tokens as a TLS Extension
+5.1.  Network Tokens as a TLS Extension
 
    Network tokens can be encoded as TLS extensions during the handshake
    phase in ClientHello, ServerHello, and HelloRetryRequest messages, as
@@ -557,7 +669,7 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 10]
+Yiakoumis               Expires October 15, 2020               [Page 12]
 
 Internet-Draft                networktokens                   April 2020
 
@@ -599,7 +711,7 @@ Internet-Draft                networktokens                   April 2020
    guarantees that network tokens cannot be dropped by intermediary
    nodes.
 
-7.2.  Network Tokens as a STUN Attribute
+5.2.  Network Tokens as a STUN Attribute
 
    Network tokens can be inserted as attributes in STUN Binding Request
    and Binding Response messages, during the handshake that preceeds
@@ -613,7 +725,7 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 11]
+Yiakoumis               Expires October 15, 2020               [Page 13]
 
 Internet-Draft                networktokens                   April 2020
 
@@ -669,12 +781,12 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 12]
+Yiakoumis               Expires October 15, 2020               [Page 14]
 
 Internet-Draft                networktokens                   April 2020
 
 
-7.3.  Network Tokens as an IPv6 Hop-by-Hop Extension Header
+5.3.  Network Tokens as an IPv6 Hop-by-Hop Extension Header
 
    Network tokens can be inserted as an IPv6 Hop-by-Hop Extension
    header, as defined in Section 4 of [RFC8200].
@@ -725,7 +837,7 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 13]
+Yiakoumis               Expires October 15, 2020               [Page 15]
 
 Internet-Draft                networktokens                   April 2020
 
@@ -752,7 +864,7 @@ Internet-Draft                networktokens                   April 2020
    two-bits can clarify this, or whether we need to make reflection part
    of the protocol-specific part and not the token itself.
 
-8.  Implementation Considerations
+6.  Implementation Considerations
 
    Network token applications (and their implementations) must decide
    the contents of the token, what protocol to insert them to, whether
@@ -760,7 +872,7 @@ Internet-Draft                networktokens                   April 2020
    reflected by peers on the reverse flow.  This section discusses
    common consideration.
 
-8.1.  Network Token contents
+6.1.  Network Token contents
 
    When deciding the contents of a token, applications should take
    effort to include only the necessary information and keep the size of
@@ -781,12 +893,12 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 14]
+Yiakoumis               Expires October 15, 2020               [Page 16]
 
 Internet-Draft                networktokens                   April 2020
 
 
-8.2.  Network Token protocol
+6.2.  Network Token protocol
 
    This specification describes three protocols where tokens might be
    inserted, and it is expected that this list will grow
@@ -825,7 +937,7 @@ Internet-Draft                networktokens                   April 2020
    multiple protocols will come from parsing and detecting tokens in
    different parts of the header.
 
-8.3.  Network Token granularity
+6.3.  Network Token granularity
 
    The granularity of a token is either per-packet or per-flow and is
    interconnected with the protocol where tokens are inserted.  The
@@ -837,12 +949,12 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 15]
+Yiakoumis               Expires October 15, 2020               [Page 17]
 
 Internet-Draft                networktokens                   April 2020
 
 
-8.3.1.  Per-packet granularity
+6.3.1.  Per-packet granularity
 
    Per-packet granularity allows stateless processing from network nodes
    and the capability to pinpoint the exact packets for traffic
@@ -859,7 +971,7 @@ Internet-Draft                networktokens                   April 2020
    unavailable).  Finally, the size of the token should be small as it
    will add overhead to all packets.
 
-8.3.2.  Per-flow granularity
+6.3.2.  Per-flow granularity
 
    Tokens with per-flow granularity can be inserted in multiple
    protocols.  As the token is sent only once per flow, its size is less
@@ -873,7 +985,7 @@ Internet-Draft                networktokens                   April 2020
    flow granularity also requires that all packets of this flow will get
    routed through this node.
 
-8.4.  Token to DiffServ mapping and reflection
+6.4.  Token to DiffServ mapping and reflection
 
    Tokens might be interpreted one or more times within a network.
 
@@ -893,12 +1005,12 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 16]
+Yiakoumis               Expires October 15, 2020               [Page 18]
 
 Internet-Draft                networktokens                   April 2020
 
 
-9.  Security Considerations
+7.  Security Considerations
 
    As any cryptographic application, it is important for users of
    network token applications to protect asymmetric private and
@@ -925,9 +1037,9 @@ Internet-Draft                networktokens                   April 2020
    setting a rate-limit to packets that go through a slow path or
    ensuring that the overall functionality is not affected.
 
-10.  IANA Considerations { #iana }
+8.  IANA Considerations { #iana }
 
-10.1.  Token Descriptor ID Registry
+8.1.  Token Descriptor ID Registry
 
    This section establishes the IANA "Network Token Descriptor ID"
    registry for token descriptors.  The registry records the descriptor
@@ -949,7 +1061,7 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 17]
+Yiakoumis               Expires October 15, 2020               [Page 19]
 
 Internet-Draft                networktokens                   April 2020
 
@@ -958,7 +1070,7 @@ Internet-Draft                networktokens                   April 2020
    whether it is useful only for a single application, and whether the
    registration description is clear.
 
-10.1.1.  Initial Registry Contents
+8.1.1.  Initial Registry Contents
 
    o  Token Descriptor ID: 0x1
 
@@ -973,7 +1085,7 @@ Internet-Draft                networktokens                   April 2020
 
    o  Specification Document(s): This document
 
-10.2.  IPv6 Hop-By-Hop options registration
+8.2.  IPv6 Hop-By-Hop options registration
 
    This section registers the value 0x0F as a IPv6 Hop-By-Hop and
    Destination Option for network tokens.
@@ -986,7 +1098,7 @@ Internet-Draft                networktokens                   April 2020
 
    o  Reference: This document
 
-10.3.  TLS ExtensionType Registry
+8.3.  TLS ExtensionType Registry
 
    This section registers the value 57 as a TLS Extension Type for
    network tokens.
@@ -997,7 +1109,7 @@ Internet-Draft                networktokens                   April 2020
 
    o  Reference: This document
 
-10.4.  STUN Attributes Registry
+8.4.  STUN Attributes Registry
 
    This section registers the value 0x001F as a STUN attribute for
    network tokens.
@@ -1005,7 +1117,7 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 18]
+Yiakoumis               Expires October 15, 2020               [Page 20]
 
 Internet-Draft                networktokens                   April 2020
 
@@ -1016,9 +1128,9 @@ Internet-Draft                networktokens                   April 2020
 
    o  Reference: This document
 
-11.  References
+9.  References
 
-11.1.  Normative References
+9.1.  Normative References
 
    [RFC5226]  Narten, T. and H. Alvestrand, "Guidelines for Writing an
               IANA Considerations Section in RFCs", RFC 5226,
@@ -1061,7 +1173,7 @@ Internet-Draft                networktokens                   April 2020
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 19]
+Yiakoumis               Expires October 15, 2020               [Page 21]
 
 Internet-Draft                networktokens                   April 2020
 
@@ -1070,7 +1182,7 @@ Internet-Draft                networktokens                   April 2020
               Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
               <https://www.rfc-editor.org/info/rfc8446>.
 
-11.2.  Informative References
+9.2.  Informative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -1117,4 +1229,4 @@ Author's Address
 
 
 
-Yiakoumis               Expires October 15, 2020               [Page 20]
+Yiakoumis               Expires October 15, 2020               [Page 22]
