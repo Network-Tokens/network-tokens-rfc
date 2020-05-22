@@ -68,44 +68,44 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
      1.1.  Network Token Overview  . . . . . . . . . . . . . . . . .   3
    2.  Motivation  . . . . . . . . . . . . . . . . . . . . . . . . .   4
-     2.1.  Existing mechanisms . . . . . . . . . . . . . . . . . . .   5
-       2.1.1.  DiffServ  . . . . . . . . . . . . . . . . . . . . . .   5
-       2.1.2.  Deep Packet Inspection  . . . . . . . . . . . . . . .   5
-     2.2.  Requirements and Challenges . . . . . . . . . . . . . . .   6
-       2.2.1.  Integration overhead  . . . . . . . . . . . . . . . .   6
-       2.2.2.  Detection Accuracy  . . . . . . . . . . . . . . . . .   7
-       2.2.3.  Fraud . . . . . . . . . . . . . . . . . . . . . . . .   8
-       2.2.4.  Implementing user-centric control . . . . . . . . . .   8
-       2.2.5.  Privacy . . . . . . . . . . . . . . . . . . . . . . .   9
-   3.  Representation  . . . . . . . . . . . . . . . . . . . . . . .   9
-   4.  Contents  . . . . . . . . . . . . . . . . . . . . . . . . . .  10
-     4.1.  Network Token Common fields . . . . . . . . . . . . . . .  10
-       4.1.1.  'iss' (Issuer) field  . . . . . . . . . . . . . . . .  10
-       4.1.2.  "sub" (Subject) field . . . . . . . . . . . . . . . .  10
-       4.1.3.  "exp" (Expiration Time) field . . . . . . . . . . . .  10
-       4.1.4.  "iat" (Issued At) field . . . . . . . . . . . . . . .  11
-       4.1.5.  "nti" field (Network Token ID) field  . . . . . . . .  11
-       4.1.6.  "bip" field (Bound IP) field  . . . . . . . . . . . .  11
-   5.  Network Token Format  . . . . . . . . . . . . . . . . . . . .  11
-   6.  Example Network Tokens  . . . . . . . . . . . . . . . . . . .  12
-     6.1.  Firewall Whitelist Token  . . . . . . . . . . . . . . . .  12
-     6.2.  Low-latency Token . . . . . . . . . . . . . . . . . . . .  13
-   7.  Network Tokens and Encapsulating protocols  . . . . . . . . .  14
-     7.1.  Network Tokens as a TLS Extension . . . . . . . . . . . .  15
-     7.2.  Network Tokens as a STUN Attribute  . . . . . . . . . . .  17
-     7.3.  Network Tokens as an IPv6 Hop-by-Hop Extension Header . .  18
-   8.  Implementation Considerations . . . . . . . . . . . . . . . .  19
-     8.1.  Contents  . . . . . . . . . . . . . . . . . . . . . . . .  20
-     8.2.  Encapsulating protocol  . . . . . . . . . . . . . . . . .  20
-     8.3.  Network Token granularity . . . . . . . . . . . . . . . .  21
-       8.3.1.  Per-packet granularity  . . . . . . . . . . . . . . .  21
-       8.3.2.  Per-flow granularity  . . . . . . . . . . . . . . . .  21
-     8.4.  Token to DiffServ mapping and reflection  . . . . . . . .  22
-   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  22
-   10. IANA Considerations { #iana } . . . . . . . . . . . . . . . .  23
-     10.1.  Token Descriptor ID Registry . . . . . . . . . . . . . .  23
-       10.1.1.  Initial Registry Contents  . . . . . . . . . . . . .  23
-     10.2.  IPv6 Hop-By-Hop options registration . . . . . . . . . .  23
+     2.1.  Use cases Overview  . . . . . . . . . . . . . . . . . . .   5
+       2.1.1.  Zero Rating . . . . . . . . . . . . . . . . . . . . .   5
+       2.1.2.  Firewall Whitelist  . . . . . . . . . . . . . . . . .   6
+       2.1.3.  QoS . . . . . . . . . . . . . . . . . . . . . . . . .   6
+     2.2.  Existing mechanisms . . . . . . . . . . . . . . . . . . .   7
+       2.2.1.  DiffServ  . . . . . . . . . . . . . . . . . . . . . .   7
+       2.2.2.  Deep Packet Inspection  . . . . . . . . . . . . . . .   8
+     2.3.  Requirements and Challenges . . . . . . . . . . . . . . .   9
+       2.3.1.  Integration overhead  . . . . . . . . . . . . . . . .   9
+       2.3.2.  Detection Accuracy  . . . . . . . . . . . . . . . . .  10
+       2.3.3.  Fraud . . . . . . . . . . . . . . . . . . . . . . . .  11
+       2.3.4.  Implementing user-centric control . . . . . . . . . .  11
+       2.3.5.  Privacy . . . . . . . . . . . . . . . . . . . . . . .  11
+   3.  Representation  . . . . . . . . . . . . . . . . . . . . . . .  12
+   4.  Contents  . . . . . . . . . . . . . . . . . . . . . . . . . .  12
+     4.1.  Network Token Common fields . . . . . . . . . . . . . . .  13
+       4.1.1.  'iss' (Issuer) field  . . . . . . . . . . . . . . . .  13
+       4.1.2.  "sub" (Subject) field . . . . . . . . . . . . . . . .  13
+       4.1.3.  "exp" (Expiration Time) field . . . . . . . . . . . .  13
+       4.1.4.  "iat" (Issued At) field . . . . . . . . . . . . . . .  14
+       4.1.5.  "nti" field (Network Token ID) field  . . . . . . . .  14
+       4.1.6.  "bip" field (Bound IP) field  . . . . . . . . . . . .  14
+   5.  Network Token Format  . . . . . . . . . . . . . . . . . . . .  14
+   6.  Example Network Tokens  . . . . . . . . . . . . . . . . . . .  15
+     6.1.  Application Token . . . . . . . . . . . . . . . . . . . .  15
+     6.2.  User-centric Token  . . . . . . . . . . . . . . . . . . .  16
+   7.  Network Tokens and Encapsulating protocols  . . . . . . . . .  17
+     7.1.  Network Tokens as a TLS Extension . . . . . . . . . . . .  18
+     7.2.  Network Tokens as a STUN Attribute  . . . . . . . . . . .  20
+     7.3.  Network Tokens as an IPv6 Hop-by-Hop Extension Header . .  21
+   8.  Implementation Considerations . . . . . . . . . . . . . . . .  22
+     8.1.  Contents  . . . . . . . . . . . . . . . . . . . . . . . .  23
+     8.2.  Encapsulating protocol  . . . . . . . . . . . . . . . . .  23
+     8.3.  Network Token granularity . . . . . . . . . . . . . . . .  24
+       8.3.1.  Per-packet granularity  . . . . . . . . . . . . . . .  24
+       8.3.2.  Per-flow granularity  . . . . . . . . . . . . . . . .  24
+     8.4.  Token to DiffServ mapping and reflection  . . . . . . . .  25
+   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  25
 
 
 
@@ -114,12 +114,16 @@ Yiakoumis & McKeown     Expires November 8, 2020                [Page 2]
 Internet-Draft                networktokens                     May 2020
 
 
-     10.3.  TLS ExtensionType Registry . . . . . . . . . . . . . . .  24
-     10.4.  STUN Attributes Registry . . . . . . . . . . . . . . . .  24
-   11. References  . . . . . . . . . . . . . . . . . . . . . . . . .  24
-     11.1.  Normative References . . . . . . . . . . . . . . . . . .  24
-     11.2.  Informative References . . . . . . . . . . . . . . . . .  25
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  25
+   10. IANA Considerations { #iana } . . . . . . . . . . . . . . . .  26
+     10.1.  Token Descriptor ID Registry . . . . . . . . . . . . . .  26
+       10.1.1.  Initial Registry Contents  . . . . . . . . . . . . .  26
+     10.2.  IPv6 Hop-By-Hop options registration . . . . . . . . . .  26
+     10.3.  TLS ExtensionType Registry . . . . . . . . . . . . . . .  27
+     10.4.  STUN Attributes Registry . . . . . . . . . . . . . . . .  27
+   11. References  . . . . . . . . . . . . . . . . . . . . . . . . .  27
+     11.1.  Normative References . . . . . . . . . . . . . . . . . .  27
+     11.2.  Informative References . . . . . . . . . . . . . . . . .  28
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  28
 
 1.  Introduction
 
@@ -157,11 +161,7 @@ Internet-Draft                networktokens                     May 2020
    the IP address of the application provider's server that generates
    the traffic so it cannot be used in a different context.
 
-   Similarly, a token for a user-driven, application-agnostic, and
-   privacy-preserving low-latency service will hold a unique user
-   identifier (like an MSISDN), the keyword "lowlatency", an expiration
-   date, a nonce for revocability, and will be encrypted with a network
-   operator's secret key.  The contents of the token will be opaque and
+
 
 
 
@@ -170,6 +170,11 @@ Yiakoumis & McKeown     Expires November 8, 2020                [Page 3]
 Internet-Draft                networktokens                     May 2020
 
 
+   Similarly, a token for a user-driven, application-agnostic, and
+   privacy-preserving low-latency service will hold a unique user
+   identifier (like an MSISDN), the keyword "lowlatency", an expiration
+   date, a nonce for revocability, and will be encrypted with a network
+   operator's secret key.  The contents of the token will be opaque and
    uninterpretable by everyone other than the operator (including the
    user).
 
@@ -212,11 +217,6 @@ Internet-Draft                networktokens                     May 2020
    prevention, privacy preservation, and compliance with net neutrality
    regulation just make the task harder.
 
-   This section discusses existing mechanisms that map traffic to
-   network differentiation services, and then details some of the
-   challenges through the perspective of different stakeholders, and how
-   network tokens can help to address them.
-
 
 
 
@@ -226,18 +226,174 @@ Yiakoumis & McKeown     Expires November 8, 2020                [Page 4]
 Internet-Draft                networktokens                     May 2020
 
 
-2.1.  Existing mechanisms
+   This section discusses usecases, existing mechanisms that map traffic
+   to network differentiation services, and then details some of the
+   challenges through the perspective of different stakeholders, and how
+   network tokens can help to address them.
+
+2.1.  Use cases Overview
+
+2.1.1.  Zero Rating
+
+   Zero rating (and similarly sponsored data and application-specific
+   data plans) is the practice of differentiating charging of internet
+   access based on the application that generated data.  For example, a
+   mobile operator might allow its users to stream music without paying
+   for data as part of a promotional offer, or purchase a discounted
+   data plan that can be used only for certain applications.  It is
+   widely deployed in cellular networks along with data usage caps.
+
+   Zero-rating services require close collaboration between application
+   providers and mobile operators.  The typical workflow involves the
+   application provider sharing an application signature with the
+   operator (i.e., a list of domains and IP addresses used to serve
+   traffic), operators configuring their networks to detect traffic with
+   these characteristics, and then map it to predefined charging groups.
+   The process repeats whenever there are updates in application
+   signatures.
+
+   A critical metric for zero-rating integrations is accuracy, i.e.,
+   what percentage of the traffic from a specific application is
+   detected (and properly charged) by the network.  Undetected traffic
+   that should otherwise be zero-rated, leads to unexpected charges or
+   packet drops for users.  Zero-rating traffic that shouldn't be zero-
+   rated, leads to loss of revenue for operators.  As such, network
+   operators evaluate detection accuracy for each application against a
+   threshold, and appropriately decide whether to add an application or
+   not.  There are typically four sources of inaccuracy:
+
+   o  Third-party traffic: Most modern applications include third-party
+      traffic which cannot be counted as part of the application
+      signature (e.g., analytics, ads, social network plugins, etc).
+
+   o  Out-of-sync application signature: Application signatures often
+      change (when servers and/or domains are added or deleted).  When
+      these changes are not incorporated in the network configuration,
+      inaccuracies occur.
+
+   o  Fraudulent behavior: Malicious users may attempt to masquerade
+      their traffic to appear as eligible zero-rating traffic when it is
+      not.  For example, one can setup a rogue proxy server, spoof a
+
+
+
+Yiakoumis & McKeown     Expires November 8, 2020                [Page 5]
+
+Internet-Draft                networktokens                     May 2020
+
+
+      zero-rated domain through the SNI field, and route all traffic
+      through this proxy.  This has lead some operators to only perform
+      zero-rating based on IP addresses.
+
+   o  Unsupported detection methods: this is common when application
+      providers use peer-to-peer connectivity, or when their traffic
+      comes from CDN servers with shared IP addresses and the operator
+      does not support domain-based signatures.
+
+   Another important metric for zero-rating is to keep onboarding and
+   operational overhead low, as operators typically zero-rate multiple
+   applications.  For example, a common practice, driven by regulatory
+   and/or commercial requirements is to apply the same treatment to a
+   group of applications from specific categories (e.g., music, video,
+   social networks, gaming).  From a regulatory perspective, the goal is
+   to provide a level playing field for competing application providers
+   according to net neutrality principles.  From a commercial
+   perspective, grouping multiple applications together can improve
+   perceived value for users.
+
+   Zero-rating is typically application-specific, and implies a trust
+   relationship between an application provider and the network.
+
+2.1.2.  Firewall Whitelist
+
+   A firewall whitelist shares many characteristics with zero-rating as
+   far as it concerns this document.  It is typically application-
+   specific, and implies a trust relationship between an application
+   provider and the network operator.
+
+   A critical metric for firewall whitelists is performance, as
+   firewalls may become bottlenecks in otherwise well-provisioned
+   networks.  Another metric is accuracy, as letting insecure traffic
+   through a firewall can become a security risk.
+
+   Firewall whitelists are typically used in enterprise networks to
+   allow traffic from certain applications through the network, or
+   bypass an expensive classification path.
+
+2.1.3.  QoS
+
+   QoS services have been historically deployed in a variety of
+   networks, and emerging use cases like SD-WAN and 5G slicing renewed
+   interest to how they are implemented.
+
+   This document is related only to QoS policies where a subset of the
+   traffic to/from an endpoint receives special treatment.  For example,
+   a scenario where a user's traffic is throttled at 10Mbps during peak
+
+
+
+Yiakoumis & McKeown     Expires November 8, 2020                [Page 6]
+
+Internet-Draft                networktokens                     May 2020
+
+
+   evening hours is out-of-scope for this document.  A scenario where a
+   user accesses a 10Mbps connection for a flat fee, an hourly 100Mbps
+   connection for an hourly fee, and she can dynamically decide which
+   packet to send to which QoS SLA is in scope for this document.
+
+   QoS policies might be either application specific, or user-centric.
+   Application-specific applications are similar to zero-rating and
+   firewall whitelists services, and imply trust between an application
+   provider and the network operator.
+
+   In contrast, user-driven QoS policies imply trust between the user
+   and the network operator, while the role of the application
+   developer, if any, is to facilitate their interaction.  In other
+   words, the network operator is not concerned with whether the traffic
+   from an application is eligible for certain treatment.  It just needs
+   to verify that the end-user requires a flow to receive a special
+   treatment.  A user might be an individual, or an organization that
+   wants to use a third-party application over a QoS SLA provided by a
+   network operator.
+
+   For example, a user-driven approach for mobile networks is
+   recommended by regulators in multiple countries as a way to offer QoS
+   differentiation in a way compliant with net neutrality regulation.
+   Additionally, services might have to be application-agnostic (i.e.,
+   the user should be able to use it for any application they want) and
+   privacy preserving (i.e., the network operator doesn't need to know
+   the application associated with this traffic to offer the service).
+
+   Similar requirements arise in enterprise networks, where companies
+   purchase multiple SLAs from their connectivity provider and want to
+   decide how they split traffic from their own and third-party
+   applications through respective paths.
+
+   QoS services are often charged based on usage, and therefore
+   accountability and verification are important aspects of it.
+
+2.2.  Existing mechanisms
 
    The two primary methods that map traffic to network differentiation
    services today are DiffServ and Deep Packet Inspection.
 
-2.1.1.  DiffServ
+2.2.1.  DiffServ
 
    DiffServ allows endpoints to mark their packets (using the 6 DSCP
    bits in the IP header) and map them to a specific class in the
    network (e.g., high bandwidth, low latency).  Although widely
    implemented in modern routers and operating systems, DiffServ has
    certain limitations.  First, the limited set of DSCP bits supports
+
+
+
+Yiakoumis & McKeown     Expires November 8, 2020                [Page 7]
+
+Internet-Draft                networktokens                     May 2020
+
+
    only 64 classes, and is already used internally by networks for their
    own purposes, leaving little room for customization.  Using them
    outside a single administrative domain would i) require all networks,
@@ -259,7 +415,13 @@ Internet-Draft                networktokens                     May 2020
    mechanism, categorizing traffic into broad classes, and DiffServ bits
    or often reset or ignored across network boundaries.
 
-2.1.2.  Deep Packet Inspection
+   Network tokens are complementary to DiffServ, not a replacement.
+   Network tokens can be used to communicate a claim in a secure way,
+   across network boundaries.  Once a token is interpreted, DiffServ can
+   be used within an administrative domain to drive enforcement on a
+   per-hop basis.
+
+2.2.2.  Deep Packet Inspection
 
    Deep Packet Inspection uses predefined application signatures to
    detect traffic of interest, and then enforces the desired policy.
@@ -274,20 +436,19 @@ Internet-Draft                networktokens                     May 2020
    privacy or net neutrality requirements strengthen, its shortcomings
    become more dominant.
 
-
-
-
-Yiakoumis & McKeown     Expires November 8, 2020                [Page 5]
-
-Internet-Draft                networktokens                     May 2020
-
-
    o  Modern applications use a variety of protocols and architectures,
       integrate third-party services, establish connectivity through
       thousands of nodes, and constantly change.  Maintaining
       application signatures is manual, expensive, and often inaccurate.
       They require frequent updates, involve manual interactions between
       parties, and cannot cover third-party traffic scenarios.
+
+
+
+Yiakoumis & McKeown     Expires November 8, 2020                [Page 8]
+
+Internet-Draft                networktokens                     May 2020
+
 
    o  Application signatures are vulnerable to fraud, as bad actors can
       spoof certain fields (like Server Name Identification) and pretend
@@ -302,9 +463,9 @@ Internet-Draft                networktokens                     May 2020
       SNI) encrypt the last bits of cleartext information sent over the
       internet, further limiting DPI-based application detection.
 
-2.2.  Requirements and Challenges
+2.3.  Requirements and Challenges
 
-2.2.1.  Integration overhead
+2.3.1.  Integration overhead
 
    Network services often require coordination between a network
    operator and an application provider.  For example, firewall
@@ -330,20 +491,21 @@ Internet-Draft                networktokens                     May 2020
    Decoupling integration from an application's infrastructure is
    important for the provider's side as well.  They don't have to pace
    deployment of new servers to give partnering neteworks advance
-
-
-
-Yiakoumis & McKeown     Expires November 8, 2020                [Page 6]
-
-Internet-Draft                networktokens                     May 2020
-
-
    warning to update their DPI, and they can still leverage a network's
    services even when they don't own a server or when the traffic is
    originating from a third-party service.  Another benefit for
    application providers is control.  Tokens give application providers
    the capability to decide when and how to use related services, so
    they can offer it only to a subset of their users, for a limited
+
+
+
+
+Yiakoumis & McKeown     Expires November 8, 2020                [Page 9]
+
+Internet-Draft                networktokens                     May 2020
+
+
    period, or run A/B experiments without any infrastructure overhead
    and without further coordination with the network.
 
@@ -358,7 +520,7 @@ Internet-Draft                networktokens                     May 2020
    token distribution, which can be as simple as a database with when an
    application asked for a token, and when this was granted.
 
-2.2.2.  Detection Accuracy
+2.3.2.  Detection Accuracy
 
    Detection accuracy captures what percentage of traffic that falls
    under a policy gets eventually detected and treated accordingly by
@@ -386,23 +548,24 @@ Internet-Draft                networktokens                     May 2020
    inaccuracies are accepted, plan transparency issues arise (e.g.,
    users might get charged for use of an applications that is promoted
    as free).  In contrast, when inaccuracies are not allowed, many
-
-
-
-Yiakoumis & McKeown     Expires November 8, 2020                [Page 7]
-
-Internet-Draft                networktokens                     May 2020
-
-
    eligible applications cannot participate, thus raising issues about
    the openness of such programs.
 
    Network tokens are decoupled from an application's backend and can
    also be applied to third-party traffic, giving application developers
+
+
+
+
+Yiakoumis & McKeown     Expires November 8, 2020               [Page 10]
+
+Internet-Draft                networktokens                     May 2020
+
+
    the capability to improve accuracy without affecting the
    functionality of their apps.
 
-2.2.3.  Fraud
+2.3.3.  Fraud
 
    Malicious users may exploit limitations in traffic detection and get
    special treatment from the network.  This often happens in zero-
@@ -423,7 +586,7 @@ Internet-Draft                networktokens                     May 2020
    that can be integrity protected and resistant to replay and spoofing
    attacks.
 
-2.2.4.  Implementing user-centric control
+2.3.4.  Implementing user-centric control
 
    One particular instance of traffic differentiation services (and
    particular QoS services) is user-centric control.  User-driven
@@ -441,21 +604,20 @@ Internet-Draft                networktokens                     May 2020
    abuse from third parties, which are necessary properties to build
    network services that involve charging and accounting.
 
-
-
-
-
-Yiakoumis & McKeown     Expires November 8, 2020                [Page 8]
-
-Internet-Draft                networktokens                     May 2020
-
-
-2.2.5.  Privacy
+2.3.5.  Privacy
 
    Privacy is often at odds with traffic differentiation services,
    especially when networks have to inspect a user's traffic to enforce
    a service, and/or this happens without a user's consent.  Regulation
    around privacy, increased user awareness, as well as emerging
+
+
+
+Yiakoumis & McKeown     Expires November 8, 2020               [Page 11]
+
+Internet-Draft                networktokens                     May 2020
+
+
    protocols like Encrypted SNI and DNS over HTTPS require new ways to
    combine privacy awareness with traffic differentiation services.
    Tokens can address such concerns in a number of ways.
@@ -498,17 +660,19 @@ Internet-Draft                networktokens                     May 2020
    Translation to a different representation format should be straight
    forward.
 
-
-
-
-Yiakoumis & McKeown     Expires November 8, 2020                [Page 9]
-
-Internet-Draft                networktokens                     May 2020
-
-
 4.  Contents
 
    The contents of a network token fulfil three main goals:
+
+
+
+
+
+
+Yiakoumis & McKeown     Expires November 8, 2020               [Page 12]
+
+Internet-Draft                networktokens                     May 2020
+
 
    o  communicate the desired information between an endpoint and the
       network (e.g., the name of an application, or a user key to
@@ -554,17 +718,17 @@ Internet-Draft                networktokens                     May 2020
    MUST be before the expiration date/time listed in the "exp" claim.
    Implementers MAY provide for some small leeway, usually no more than
    a few minutes, to account for clock skew.  The "exp" field can be
-
-
-
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 10]
-
-Internet-Draft                networktokens                     May 2020
-
-
    used to reduce the probability of replay attacks, restrict service
    access to a certain period, or to force users to refresh
    authentication credentials.
+
+
+
+
+Yiakoumis & McKeown     Expires November 8, 2020               [Page 13]
+
+Internet-Draft                networktokens                     May 2020
+
 
 4.1.4.  "iat" (Issued At) field
 
@@ -610,18 +774,17 @@ Internet-Draft                networktokens                     May 2020
       registered in the "Token Descriptor ID" registry (MSB = 0) or
       private (MSB equals 1).  For private descriptor IDs, the definer
       of the value needs to take reasonable precautions to make sure
-
-
-
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 11]
-
-Internet-Draft                networktokens                     May 2020
-
-
       they are in control of the part of the namespace they use (e.g.,
       by using a OUI prefix).  A token descriptor might just indicate
       that the token payload is a JWT, or point to a structure that
       holds keys and other information to interpret a token.
+
+
+
+Yiakoumis & McKeown     Expires November 8, 2020               [Page 14]
+
+Internet-Draft                networktokens                     May 2020
+
 
    o  Token Payload: Depending on the application, the token payload
       might be a self-contained JWT or CWT (as plaintext, signed, or
@@ -651,10 +814,11 @@ Internet-Draft                networktokens                     May 2020
    This section discusses example network tokens and how they can serve
    specific use cases.
 
-6.1.  Firewall Whitelist Token
+6.1.  Application Token
 
-   A firewall token can be used to whitelist traffic from trusted
-   applications.
+   An application token can be used to whitelist traffic from trusted
+   applications for a zero-rating or firewall whitelist scenario (as
+   discussed in Section {#usecases}.
 
    The following example verifies that a network flow is coming from
    "The Godfather App".
@@ -663,20 +827,20 @@ Internet-Draft                networktokens                     May 2020
    Extension attached in a Server Hello Message.
 
    The Reflect Type is 0x00 (i.e., peers should not reflect it), with
-   the expectation that firewalls can setup appropriate state for the
-   reverse flow as well.  The Token Descriptor ID is 0x03, which might
-   represent a registered value for firewall tokens.
-
-
-
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 12]
-
-Internet-Draft                networktokens                     May 2020
-
+   the expectation that network flows can setup appropriate state for
+   the reverse flow as well.  The Token Descriptor ID is 0x03, which
+   might represent a registered value for application tokens.
 
    The JWT encodes the following object.
 
    The header of the JWT has the following fields:
+
+
+
+Yiakoumis & McKeown     Expires November 8, 2020               [Page 15]
+
+Internet-Draft                networktokens                     May 2020
+
 
    {"alg":"ES256", "kid":"N6fr1MDrEuu1eXRkFbcpX4WY62SKN7TKrhYf9PfJEd8"}
 
@@ -698,11 +862,13 @@ Internet-Draft                networktokens                     May 2020
    context.  For example, the application provider could configure all
    exit gateways to attach a token for all outgoing flows.
 
-6.2.  Low-latency Token
+6.2.  User-centric Token
 
-   A low-latency token is used to access a custom QoS SLA from a mobile
-   operator tailored for video communications.  This is an application-
-   agnostic service, i.e., users can use it for any traffic they want.
+   A user-centric token may be used to access a custom QoS SLA (e.g.,
+   low latency) from a mobile operator.  This is an application-agnostic
+   and privacy-preserving token, i.e., users can use it for any traffic
+   they want and the network operator doesn't need to know what
+   application is associated with ths token.
 
    The token payload is encoded as a JWT, and can be inserted to STUN
    (as STUN attributes) or IPv6 packets (as IPv6 Hop-by-Hop extension
@@ -720,19 +886,17 @@ Internet-Draft                networktokens                     May 2020
    algorith, using an operator's symmetric key.  The app_id points to an
    operator-specific identifier associated with its own services.
 
-
-
-
-
-
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 13]
-
-Internet-Draft                networktokens                     May 2020
-
-
    The payload of the token has the following fields, requesting for
    low-latency treatment, and bounding the start and end time of the
    token.  It also has a unique identifier to allow revocation.
+
+
+
+
+Yiakoumis & McKeown     Expires November 8, 2020               [Page 16]
+
+Internet-Draft                networktokens                     May 2020
+
 
 {'srv':'lowlatency', 'msisdn':'+4151111111111', 'nti': 5871234, iat':1588116732, 'exp':1588203132}
 
@@ -776,19 +940,19 @@ Internet-Draft                networktokens                     May 2020
       guarantees that a token is contained in a single packet or might
       be carried over multiple packets.
 
-
-
-
-
-
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 14]
-
-Internet-Draft                networktokens                     May 2020
-
-
    This section discusses the use of tokens in three widely used
    protocols, and section {#iana} describes recommended IANA changes for
    each protocol.
+
+
+
+
+
+
+Yiakoumis & McKeown     Expires November 8, 2020               [Page 17]
+
+Internet-Draft                networktokens                     May 2020
+
 
    For the examples below we will use the following 227-byte long
    network token, which encodes (in hex notation) the low-latency token
@@ -837,7 +1001,11 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 15]
+
+
+
+
+Yiakoumis & McKeown     Expires November 8, 2020               [Page 18]
 
 Internet-Draft                networktokens                     May 2020
 
@@ -893,7 +1061,7 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 16]
+Yiakoumis & McKeown     Expires November 8, 2020               [Page 19]
 
 Internet-Draft                networktokens                     May 2020
 
@@ -949,7 +1117,7 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 17]
+Yiakoumis & McKeown     Expires November 8, 2020               [Page 20]
 
 Internet-Draft                networktokens                     May 2020
 
@@ -1005,7 +1173,7 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 18]
+Yiakoumis & McKeown     Expires November 8, 2020               [Page 21]
 
 Internet-Draft                networktokens                     May 2020
 
@@ -1061,7 +1229,7 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 19]
+Yiakoumis & McKeown     Expires November 8, 2020               [Page 22]
 
 Internet-Draft                networktokens                     May 2020
 
@@ -1117,7 +1285,7 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 20]
+Yiakoumis & McKeown     Expires November 8, 2020               [Page 23]
 
 Internet-Draft                networktokens                     May 2020
 
@@ -1173,7 +1341,7 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 21]
+Yiakoumis & McKeown     Expires November 8, 2020               [Page 24]
 
 Internet-Draft                networktokens                     May 2020
 
@@ -1229,7 +1397,7 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 22]
+Yiakoumis & McKeown     Expires November 8, 2020               [Page 25]
 
 Internet-Draft                networktokens                     May 2020
 
@@ -1285,7 +1453,7 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 23]
+Yiakoumis & McKeown     Expires November 8, 2020               [Page 26]
 
 Internet-Draft                networktokens                     May 2020
 
@@ -1341,7 +1509,7 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 24]
+Yiakoumis & McKeown     Expires November 8, 2020               [Page 27]
 
 Internet-Draft                networktokens                     May 2020
 
@@ -1397,4 +1565,4 @@ Authors' Addresses
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 25]
+Yiakoumis & McKeown     Expires November 8, 2020               [Page 28]
