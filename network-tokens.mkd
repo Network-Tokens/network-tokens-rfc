@@ -43,7 +43,7 @@ informative:
 
 --- abstract
 
-Network Tokens is a method to securely transfer claims between endpoints and a network to drive or assist network policy. They are inserted by endpoints in existing protocols, interpreted by trusted networks, and may be signed or encrypted to meet security and privacy requirements. Network Tokens can be represented as JSON Web Tokens, CBOR Web Tokens, or other available formats. They can be used to expose and access a variety of datapath network services such as firewall whitelists, QoS, and zero-rating services.
+Network tokens is a method for endpoints to explicitly and securely coordinate with networks about how their traffic is treated. They are inserted by endpoints in existing protocols, interpreted by trusted networks, and may be signed or encrypted to meet security and privacy requirements. Network tokens provide a means for network operators to expose datapath services (such as a zero-rating service, a user-driven QoS service, or a firewall whitelist), and for end users and application providers to access such services. Network tokens are inspired and derived by existing security tokens (like JWT and CWT), and borrow several of their core ideas along with security and privacy properties. 
 
 --- middle
 

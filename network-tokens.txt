@@ -14,14 +14,17 @@ Expires: November 8, 2020                            Stanford University
 
 Abstract
 
-   Network Tokens is a method to securely transfer claims between
-   endpoints and a network to drive or assist network policy.  They are
-   inserted by endpoints in existing protocols, interpreted by trusted
-   networks, and may be signed or encrypted to meet security and privacy
-   requirements.  Network Tokens can be represented as JSON Web Tokens,
-   CBOR Web Tokens, or other available formats.  They can be used to
-   expose and access a variety of datapath network services such as
-   firewall whitelists, QoS, and zero-rating services.
+   Network tokens is a method for endpoints to explicitly and securely
+   coordinate with networks about how their traffic is treated.  They
+   are inserted by endpoints in existing protocols, interpreted by
+   trusted networks, and may be signed or encrypted to meet security and
+   privacy requirements.  Network tokens provide a means for network
+   operators to expose datapath services (such as a zero-rating service,
+   a user-driven QoS service, or a firewall whitelist), and for end
+   users and application providers to access such services.  Network
+   tokens are inspired and derived by existing security tokens (like JWT
+   and CWT), and borrow several of their core ideas along with security
+   and privacy properties.
 
 Status of This Memo
 
@@ -47,9 +50,6 @@ Copyright Notice
 
    This document is subject to BCP 78 and the IETF Trust's Legal
    Provisions Relating to IETF Documents
-   (https://trustee.ietf.org/license-info) in effect on the date of
-   publication of this document.  Please review these documents
-   carefully, as they describe your rights and restrictions with respect
 
 
 
@@ -58,6 +58,9 @@ Yiakoumis & McKeown     Expires November 8, 2020                [Page 1]
 Internet-Draft                networktokens                     May 2020
 
 
+   (https://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
    to this document.  Code Components extracted from this document must
    include Simplified BSD License text as described in Section 4.e of
    the Trust Legal Provisions and are provided without warranty as
@@ -103,9 +106,6 @@ Table of Contents
      8.2.  Encapsulating protocol  . . . . . . . . . . . . . . . . .  23
      8.3.  Network Token granularity . . . . . . . . . . . . . . . .  24
        8.3.1.  Per-packet granularity  . . . . . . . . . . . . . . .  24
-       8.3.2.  Per-flow granularity  . . . . . . . . . . . . . . . .  24
-     8.4.  Token to DiffServ mapping and reflection  . . . . . . . .  25
-   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  25
 
 
 
@@ -114,6 +114,9 @@ Yiakoumis & McKeown     Expires November 8, 2020                [Page 2]
 Internet-Draft                networktokens                     May 2020
 
 
+       8.3.2.  Per-flow granularity  . . . . . . . . . . . . . . . .  24
+     8.4.  Token to DiffServ mapping and reflection  . . . . . . . .  25
+   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  25
    10. IANA Considerations { #iana } . . . . . . . . . . . . . . . .  26
      10.1.  Token Descriptor ID Registry . . . . . . . . . . . . . .  26
        10.1.1.  Initial Registry Contents  . . . . . . . . . . . . .  26
@@ -159,9 +162,6 @@ Internet-Draft                networktokens                     May 2020
    address of the application provider's server that generates the
    traffic so it cannot be used in a different context.
 
-   Similarly, a token might state the request of an end-user to access a
-   network service, such as a low-latency and reliable QoS SLA, in a
-   user-centric, application agnostic, and privacy preserving means.
 
 
 
@@ -170,6 +170,9 @@ Yiakoumis & McKeown     Expires November 8, 2020                [Page 3]
 Internet-Draft                networktokens                     May 2020
 
 
+   Similarly, a token might state the request of an end-user to access a
+   network service, such as a low-latency and reliable QoS SLA, in a
+   user-centric, application agnostic, and privacy preserving means.
    Such a token (a "user-centric token"), will hold a unique user
    identifier (like an MSISDN), the keyword "lowlatency", an expiration
    date, a nonce for revocability, and will be encrypted with a network
@@ -215,9 +218,6 @@ Internet-Draft                networktokens                     May 2020
 
    Identifying traffic of interest is not straight forward, as it often
    depends on context not present in the related packets themselves.
-   For example, the decision to allow a packet through a firewall or
-   zero-rating whitelist is based on the application that generated the
-   packet, while routing a flow through a low-latency path depends on
 
 
 
@@ -226,6 +226,9 @@ Yiakoumis & McKeown     Expires November 8, 2020                [Page 4]
 Internet-Draft                networktokens                     May 2020
 
 
+   For example, the decision to allow a packet through a firewall or
+   zero-rating whitelist is based on the application that generated the
+   packet, while routing a flow through a low-latency path depends on
    the desire of a user to prioritize this flow and potentially pay for
    it.  Requirements around accountability and verification, fraud
    prevention, privacy preservation, and compliance with net neutrality
@@ -272,9 +275,6 @@ Internet-Draft                networktokens                     May 2020
       traffic which cannot be counted as part of the application
       signature (e.g., analytics, ads, social network plugins, etc).
 
-   o  Out-of-sync application signature: Application signatures often
-      change (when servers and/or domains are added or deleted).  When
-
 
 
 Yiakoumis & McKeown     Expires November 8, 2020                [Page 5]
@@ -282,6 +282,8 @@ Yiakoumis & McKeown     Expires November 8, 2020                [Page 5]
 Internet-Draft                networktokens                     May 2020
 
 
+   o  Out-of-sync application signature: Application signatures often
+      change (when servers and/or domains are added or deleted).  When
       these changes are not incorporated in the network configuration,
       inaccuracies occur.
 
@@ -327,8 +329,6 @@ Internet-Draft                networktokens                     May 2020
    Firewall whitelists are typically used in enterprise networks to
    allow traffic from certain applications through the network, or
    bypass an expensive classification path.
-
-
 
 
 
