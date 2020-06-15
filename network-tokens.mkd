@@ -39,6 +39,7 @@ normative:
 
 informative:
   RFC2119:
+  RFC2475:
 
 --- abstract
 
@@ -54,25 +55,19 @@ This specification motivates and describes network tokens, a method for endpoint
 
 A network token is a small piece of data that end users attach to their packets. As packets flow through the network, intermediate nodes MAY detect tokens, interpret them, and apply the desired service to the packets that carry them (and possibly to all other packets from the same flow). 
 
-Tokens MAY be digitally signed, integrity protected and/or encrypted to account for privacy and security, and can be provisioned to prevent replay and spoofing attacks. 
+Tokens MAY be digitally signed, integrity protected and/or encrypted to account for privacy and security, and can be provisioned to prevent replay and spoofing attacks.
 
-Tokens are policy-agnostic, i.e., they just provide a unified mechanism to communicate and interpret certain claims in the datapath. Network services built using tokens can dictate the desired policy through token (or token metadata) distribution, and the cryptographic functions applied to them. 
+Tokens carry simple claims that can drive network policy.
 
-For example, a firewall whitelist token would state the name of the application to be whitelisted, be signed with the private key of the application provider, and could be interpreted and verified by anyone with the application provider's public key. It may also be bound to the IP address of the application provider's server that generates the traffic so it cannot be used in a different context.
+For example, a token might just state the name of the application that a packet originates from, which can then be used by firewalls and/or zero-rating whitelists. Such a token (an "application token"), would be signed with the private key of the application provider, and could be interpreted and verified by any one with the application provider's public key. It may also be bound to the IP address of the application provider's server that generates the traffic so it cannot be used in a different context.
 
-Similarly, a token for a user-driven, application-agnostic, and privacy-preserving low-latency service will hold a unique user identifier (like an MSISDN), the keyword "lowlatency", an expiration date, a nonce for revocability, and will be encrypted with a network operator's secret key. The contents of the token will be opaque and uninterpretable by everyone other than the operator (including the user). 
+Similarly, a token might state the request of an end-user to access a network service, such as a low-latency and reliable QoS SLA, in a user-centric, application agnostic, and privacy preserving means. Such a token (a "user-centric token"), will hold a unique user identifier (like an MSISDN), the keyword "lowlatency", an expiration date, a nonce for revocability, and will be encrypted with a network operator's secret key. The contents of the token will be opaque and uninterpretable by everyone other than the operator (including the user).
+
+Tokens are policy-agnostic, i.e., they just provide a unified mechanism to communicate and interpret certain claims in the datapath. Network services built using tokens can dictate the desired policy through token (or token metadata) distribution, and the cryptographic functions applied to them.
 
 Network tokens do not dictate a dedicated header or protocol to be inserted. Instead, they are incorporated as options and extensions into a variety of existing protocols. For example, they can be carried as TLS Client and Server Hello extensions during a TLS handshake, as IPv6 Hop by Hop Options, or as attributes during a STUN-enabled flow setup. Network tokens are largely opaque to the protocols that carry them. 
 
-Network tokens are inspired and derived by existing security tokens, like JSON Web Token (JWT) {{RFC7519}} and CBOR Web Token (CWT) {{RFC8392}}. In fact, network tokens MAY be represented as JWT and CWT objects, and respectively use JOSE and COSE technologies for signing and encryption. 
-
-{::comment}
-
-The JSON Web Token (JWT) [RFC7519] and CBOR Web Token (CWT) [RFC8392] are  standardized security token formats that have found use in OAuth 2.0, OpenID Connect, and Internet of Things deployments, among other applications. JWT and CWT use JSON Object Signature and Encryption (JOSE) and COBR Object Signature and Encryption (COSE) technologies to secure the contents of tokens, which essentially are a set of claims represented in JSON or CBOR. 
-
-This specification motivates and describes the use of tokens - named network tokens - as a method to securely transfer claims between endpoints and a network to drive and/or assist network policy. Network tokens are inserted by endpoints in existing protocols, interpreted by trusted networks, and may be signed or encrypted to meet a variety of security and privacy requirements. They can be encoded as JSON Web Tokens, CBOR Web Tokens, or other available formats.  Network tokens can be used to expose and access a variety of network services such as firewall whitelists, QoS, and zero-rating services.
-
-{:/comment}
+Network tokens are inspired and derived by existing security tokens, like JSON Web Token (JWT) {{RFC7519}} and CBOR Web Token (CWT) {{RFC8392}}, and borrow a lot of their properties in terms of security and privacy. In fact, network tokens MAY be represented as JWT and CWT objects, and respectively use JOSE and COSE technologies for signing and encryption. 
 
 {::comment}
 
@@ -86,7 +81,7 @@ This specification motivates and describes the use of tokens - named network tok
 
 Network traffic differentiation is widely deployed in enterprise, residential, and cellular networks. Typical use cases are firewall whitelists, zero-rating programs, and custom QoS SLAs where certain traffic is granted special treatment. 
 
-A common concern for all such services is how to identify traffic of interest in order to map it to (and enforce) the desired network policy. The mechanism that does this essentially becomes the interface between networks, application providers and end-users, and has direct implications to network management and security, user privacy, business practices, and compliance with net neutrality regulation. 
+A common concern for all such services is how to identify traffic of interest in order to map it to (and enforce) the desired network policy. The mechanism that does this essentially becomes the interface between network operators, application providers and end-users, and has direct implications to network management and security, user privacy, business practices, and compliance with net neutrality regulation. 
 
 Identifying traffic of interest is not straight forward, as it often depends on context not present in the related packets themselves. For example, the decision to allow a packet through a firewall or zero-rating whitelist is based on the application that generated the packet, while routing a flow through a low-latency path depends on the desire of a user to prioritize this flow and potentially pay for it. Requirements around accountability and verification, fraud prevention, privacy preservation, and compliance with net neutrality regulation just make the task harder. 
 
@@ -96,7 +91,7 @@ This section discusses usecases, existing mechanisms that map traffic to network
 
 ### Zero Rating
 
-Zero rating (and similarly sponsored data and application-specific data plans) is the practice of differentiating charging of internet access based on the application that generated data. For example, a mobile operator might allow its users to stream music without paying for data as part of a promotional offer, or purchase a discounted data plan that can be used only for certain applications. It is widely deployed in cellular networks along with data usage caps. 
+Zero rating (and similarly sponsored data and other application-specific data plans) is the practice of differentiating charging of internet access based on the application that generated data. For example, a mobile operator might allow its users to stream music without paying for data as part of a promotional offer, or purchase a discounted data plan that can be used only for certain applications. It is deployed in several cellular networks along with data usage caps. 
 
 Zero-rating services require close collaboration between application providers and mobile operators. The typical workflow involves the application provider sharing an application signature with the operator (i.e., a list of domains and IP addresses used to serve traffic), operators configuring their networks to detect traffic with these characteristics, and then map it to predefined charging groups. The process repeats whenever there are updates in application signatures.
 
@@ -109,7 +104,7 @@ A critical metric for zero-rating integrations is accuracy, i.e., what percentag
 
 Another important metric for zero-rating is to keep onboarding and operational overhead low, as operators typically zero-rate multiple applications. For example, a common practice, driven by regulatory and/or commercial requirements is to apply the same treatment to a group of applications from specific categories (e.g., music, video, social networks, gaming). From a regulatory perspective, the goal is to provide a level playing field for competing application providers according to net neutrality principles. From a commercial perspective, grouping multiple applications together can improve perceived value for users. 
 
-Zero-rating is typically application-specific, and implies a trust relationship between an application provider and the network.
+Zero-rating is typically either application-specific, or specific to a category of applications, and implies a trust relationship between an application provider and the network.
 
 ### Firewall Whitelist
 
@@ -127,11 +122,11 @@ This document is related only to QoS policies where a subset of the traffic to/f
 
 QoS policies might be either application specific, or user-centric. Application-specific applications are similar to zero-rating and firewall whitelists services, and imply trust between an application provider and the network operator. 
 
-In contrast, user-driven QoS policies imply trust between the user and the network operator, while the role of the application developer, if any, is to facilitate their interaction. In other words, the network operator is not concerned with whether the traffic from an application is eligible for certain treatment. It just needs to verify that the end-user requires a flow to receive a special treatment. A user might be an individual, or an organization that wants to use a third-party application over a QoS SLA provided by a network operator.
+In contrast, user-driven QoS policies imply trust between the user and the network operator, while the role of the application developer, if any, is to facilitate their interaction. In other words, the network operator is not concerned with whether the traffic from an application is eligible for certain treatment. It just needs to verify that the end-user requires a flow to receive a special treatment. A user might be an individual, an enterprise, or an organization that wants to use a third-party application over a QoS SLA provided by a network operator.
 
 For example, a user-driven approach for mobile networks is recommended by regulators in multiple countries as a way to offer QoS differentiation in a way compliant with net neutrality regulation. Additionally, services might have to be application-agnostic (i.e., the user should be able to use it for any application they want) and privacy preserving (i.e., the network operator doesn't need to know the application associated with this traffic to offer the service). 
 
-Similar requirements arise in enterprise networks, where companies purchase multiple SLAs from their connectivity provider and want to decide how they split traffic from their own and third-party applications through respective paths.
+Similar requirements arise in enterprise networks, where companies purchase multiple SLAs from their connectivity provider and want to decide how they differentiate traffic from different applications through respective paths.
 
 QoS services are often charged based on usage, and therefore accountability and verification are important aspects of it. 
 
@@ -141,22 +136,15 @@ The two primary methods that map traffic to network differentiation services tod
 
 ### DiffServ
 
-DiffServ allows endpoints to mark their packets (using the 6 DSCP bits in the IP header) and map them to a specific class in the network (e.g., high
-bandwidth, low latency). Although widely implemented in modern routers and operating systems, DiffServ has certain limitations. First, the limited set of DSCP bits supports only 64 classes, and is already used internally by networks for their own purposes, leaving little room for
-customization. Using them outside a single administrative domain would i) require all networks, operating systems and applications to agree at a pre-defined meaning for each DSCP code (which has been proven impractical),
-ii) expect every element in the path to respect or at the very least not alter the DSCP marking, and iii) require networks to use a different mechanism for their own needs. 
+DiffServ {{RFC2475}} uses DSCP bits in the IP header to map traffic into specific classes and drive per-hop-behavior in the network for traffic differentiation. DiffServ operates within a single administrative domain, and assumes that traffic is properly marked and classified in the network boundaries. In many practical deployments, the endpoints under consideration are not under the network's administrative domain and this causes issues.
 
-Second, and maybe most important, DiffServ has no authentication and revocation primitives: any application can set the DSCP bits and request service without the user’s consent. Any developer can ask for special network treatment even if it conflicts with a user's desire, or—even worse—if it results in network charges for users,
-and users or operators do not have the means to easily revoke such access. 
+Intermediate nodes in the path may alter or reset the DSCP bits (e.g., to use them for their own purposes), therefore nullyfying any endpoint marking. Second, and maybe most important, DiffServ has no authentication and revocation primitives: any application can set the DSCP bits and request service without the user’s consent. Any developer can ask for special network treatment even if it conflicts with a user's desire, or—even worse—if it results in network charges for users, and users or operators do not have the means to easily revoke such access. 
 
-As a result, DiffServ is better suited as an internal marking mechanism, categorizing traffic into broad classes, and DiffServ bits or often reset or ignored across network boundaries. 
-
-Network tokens are complementary to DiffServ, not a replacement. Network tokens can be used to communicate a claim in a secure way, across network boundaries. Once a token is interpreted, DiffServ can be used within an administrative domain to drive enforcement on a per-hop basis.
-
+Network tokens can solve such problems as they operate across network boundaries, and support revocation and authentication. In that sense, tokens are complementary to DiffServ, not a replacement. They can be used to communicate a claim in a secure way, across network boundaries. Once a token is interpreted, DiffServ can be used within an administrative domain to drive enforcement on a per-hop basis.
 
 ### Deep Packet Inspection
 
-Deep Packet Inspection uses predefined application signatures to detect traffic of interest, and then enforces the desired policy. Application signatures are a combination of IP addresses, domain names, SSL certificates, and other fields, that infer the application that generated traffic by implicitly observing traffic between endpoints. They are widely deployed today as an enabler for traffic differentiation services. 
+Deep Packet Inspection uses predefined application signatures to detect traffic of interest, and then enforces the desired policy. Application signatures are a combination of IP addresses, domain names, SSL certificates, and other fields, that infer the application that generated traffic by implicitly observing traffic between endpoints. They are widely deployed by network operators today as an enabler for traffic differentiation services. 
 
 The advantage of DPI is that it requires no changes from endpoints. But as new usecases come up, applications grow in complexity, and privacy or net neutrality requirements strengthen, its shortcomings become more dominant. 
 
@@ -172,13 +160,13 @@ The advantage of DPI is that it requires no changes from endpoints. But as new u
 
 ### Integration overhead
 
-Network services often require coordination between a network operator and an application provider. For example, firewall whitelists and zero-rating programs require the coordination between networks and the applications to be whitelisted (or zero-rated). It is typical for such programs to include a large and growing number of applications, and the integration process and mapping interface matters a lot, as it dictates the required effort for both networks and application providers. 
+Network services often require coordination between a network operator and an application provider. For example, firewall whitelists and zero-rating programs require the coordination between networks and the applications to be whitelisted (or zero-rated). It is typical for such programs to include a large and growing number of applications, and the integration process and mapping interface matters a lot, as it dictates the required effort for both network operators and application providers. 
 
 Network operators want to streamline the onboarding process for new applications in their programs, and also minimize the overhead to keep these integrations functional and accurate. They also want to make it easy for third parties to integrate and use their services. Network tokens enable operators to onboard new applications just by granting them a new token, without additional per-application overhead to create, evaluate, and maintain app signatures. A token-based approach also decouples integration from the architecture of an application provider, meaning that there is no need for updates and maintenance every time an application partner changes its infrastructure. 
 
-Decoupling integration from an application's infrastructure is important for the provider's side as well. They don't have to pace deployment of new servers to give partnering neteworks advance warning to update their DPI, and they can still leverage a network's services even when they don't own a server or when the traffic is originating from a third-party service. Another benefit for application providers is control. Tokens give application providers the capability to decide when and how to use related services, so they can offer it only to a subset of their users, for a limited period, or run A/B experiments without any infrastructure overhead and without further coordination with the network. 
+Decoupling integration from an application's infrastructure is important for the application provider's side as well. They don't have to pace deployment of new servers to give partnering networks advance warning to update their DPI, and they can still leverage a network's services even when they don't own a server or when the traffic is originating from a third-party service. Another benefit for application providers is control. Tokens give application providers the capability to decide when and how to use related services, so they can offer it only to a subset of their users, for a limited period, or run A/B experiments without any infrastructure overhead and without further coordination with the network. 
 
-Regulators MAY require that zero-rating programs or other specialized services are available to a large number of application providers. For example many zero-rating programs are required to onboard all applications in a category. Network tokens offer a straight-forward and low overhead onboarding process, and make it easier to keep implementations compliant. Regulators may also have to monitor commercial practices for compliance, and therefore auditability becomes important. With network tokens, audits need to only check token distribution, which can be as simple as a database with when an application asked for a token, and when this was granted. 
+Regulators MAY require that zero-rating programs are available to a large number of application providers. For example many zero-rating programs are required to onboard all applications in a category. Network tokens offer a straight-forward and low overhead onboarding process, and make it easier to keep implementations compliant. Regulators may also have to monitor commercial practices for compliance, and therefore auditability becomes important. With network tokens, audits need to only check token distribution, which can be as simple as a database with when an application asked for a token, and when this was granted. 
 
 ### Detection Accuracy
 
@@ -186,13 +174,13 @@ Detection accuracy captures what percentage of traffic that falls under a policy
 
 Many integrations do not happen just because of inaccuracy reasons, causing issues for both application providers and operators. In other cases, application providers might have to change the functionality for such integrations to happen (e.g., disable ads) which can have a significant impact on their business and/or user experience. 
 
-Once an integration is established, failing to detect traffic may lead to uninteded charges for users and dissatisfaction. Operators have to retroactively perform troubleshooting, deal with customer support, and issue refunds. 
+Once an integration is established, failing to detect traffic may lead to unintended charges for users and dissatisfaction. Operators have to retroactively perform troubleshooting, deal with customer support, and issue refunds. 
 
-Inaccuracies also pose a trade-off for regulators: if detection inaccuracies are accepted, plan transparency issues arise (e.g., users might get charged for use of an applications that is promoted as free). In contrast, when inaccuracies are not allowed, many eligible applications cannot participate, thus raising issues about the openness of such programs. 
+Inaccuracies also pose a trade-off for regulators: if detection inaccuracies are accepted, plan transparency issues arise (e.g., users might get charged for use of an application that is promoted as free). In contrast, when inaccuracies are not allowed, some eligible applications cannot participate without modifications to their implementation, thus raising issues about the openness of such programs or entry barriers to market. 
 
 Network tokens are decoupled from an application's backend and can also be applied to third-party traffic, giving application developers the capability to improve accuracy without affecting the functionality of their apps. 
 
-### Fraud
+### Fraud Prevention
 
 Malicious users may exploit limitations in traffic detection and get special treatment from the network. This often happens in zero-rating services, where malicious users setup a proxy server, connect to it using the properties (e.g., SNI) of an otherwise zero-rated application, and essentially zero-rate all their traffic. 
 
@@ -220,22 +208,6 @@ Network tokens can also promote privacy for application-based network services. 
 
 As protocols like ESNI and DoH emerge, network tokens enable application providers to adopt them, and at the same time integrate with trusted networks. Respectively, they can enable network operators to expose traffic differentiation services, even when traffic is largely opaque to them. 
 
-{::comment}
-
-# Network Token Overview
-
-A network token is a small piece of data that end users attach to their packets to access a whitelist-based network service. As packets flow through the network, intermediate nodes detect tokens, interpret them, and apply the desired service to the packets that carry them (and possibly to all other packets from the same flow). 
-
-Network tokens are always interpreted by a network operator. Token generation depends on the use case and trust relationship between the different entities involved. For example, tokens might be generated by the network who distributes it to eligible end-users on-demand. Alternatively, the operator can enable users to generate multiple tokens themselves, or application providers might generate tokens and tell operators how to interpret them. 
-
-To prevent unauthorized third-parties from replaying, spoofing, or interpreting a token, tokens may be signed and encrypted, in ways described below. Network tokens can use custom or existing representation formats, like JWT {{RFC7515}} or CWT {{RFC7516}}. Section XX discusses example tokens for specific usecases.
-
-Network tokens do not dictate a dedicated header or protocol to be inserted. Instead, they are incorporated as options and extensions into a variety of existing protocols. For example, network tokens can be carried as TLS Client and Server Hello extensions during a TLS handshake, as IPv6 destination or Hop by Hop Options, or as attributes during a STUN-enabled flow setup. Network tokens are largely opaque to the protocols that carry them. Section XX discusses implementation details for inserting tokens, and Section XX lists recommended IANA registry changes for TLS, STUN, and IPv6. 
-
-The distribution of tokens is out of scope for this document. 
-
-{:/comment}
-
 # Representation
 
 Network tokens can be represented in different formats. For example, a network operator might structure a token as a pre-defined byte sequence or a list of TLV-encoded fields. Alternatively, tokens can use existing JOSE and COSE technologies for representation, as they already provide a framework to securely communicate information between different entities. The actual representation and contents of a token should take into consideration the capabilities of the network to process them (i.e, what cryptographic functionality can the network support), the token's length in terms of header space, and requirements for integrity protection, privacy preservation, and attack scenarios. 
@@ -245,12 +217,8 @@ Examples in this document will use JWT to represent tokens, as they are well und
 
 # Contents
 
-The contents of a network token fulfil three main goals:
-
-* communicate the desired information between an endpoint and the network (e.g., the name of an application, or a user key to request low-latency services)
-* prevent unauthorized parties from replaying or using these tokens to inadvertently access network services (e.g., through the use of timestamps, expiration time, nonces)
-* digitally sign and/or encrypt a token to meet privacy and security requirements
-
+The contents of a network token communicate the desired information between an endpoint and the network (e.g., the name of an application, or a user's request to access a low-latency services. 
+Along with these claims, tokens carry necessary metadata to i) digitally sign and/or encrypt a token to meet privacy and security requirements, and ii) prevent unauthorized parties from replaying or using these tokens to inadvertently access network services (e.g., through the use of timestamps, expiration time, nonces).
 
 ## Network Token Common fields
 
@@ -259,14 +227,12 @@ Network tokens can have arbitrary fields (or claims). The fields defined below, 
 ### 'iss' (Issuer) field
 
 The "iss" (issuer) field identifies the principal that issued the
-token.  For example, the issuer might be the name of the network operator that offers the service of interest. The processing of this claim is generally application specific.
+token.  For example, the issuer might be the name of the network operator that offers the service of interest. 
 
 ### "sub" (Subject) field
 
 The "sub" (subject) field identifies the principal that is the
-subject of the token.  This could be a subscriber id, or the name of an application. The subject value MUST either be scoped to be
-locally unique in the context of the issuer or be globally unique.
-The processing of this claim is generally application specific. 
+subject of the token.  This could be a subscriber id, or the name of an application. 
 
 ### "exp" (Expiration Time) field
 
@@ -512,7 +478,7 @@ STUN messages can be protected for message integrity, and as such they can guara
 
 ## Network Tokens as an IPv6 Hop-by-Hop Extension Header
 
-Network tokens can be inserted as an IPv6 Hop-by-Hop Extension header, as defined in Section 4 of {{RFC8200}}.
+Network tokens can be inserted as an IPv6 Hop-by-Hop Extension header, as defined in Section 4 of {{RFC8200}}. 
 
 Network tokens used as IPv6 extension headers can be either flow or packet specific. The expectation must be defined by the network service itself, and the endpoints can decide to which packets to insert a token. For example, they can insert a token at every packet of a specific flow, every few seconds, or only at the first packet of a flow. The network should accordingly implement the policy. 
 
@@ -568,7 +534,7 @@ When deciding the contents of a token, applications should take effort to includ
 
 This specification describes three protocols where tokens might be inserted, and it is expected that this list will grow.
 
-IPv6 tokens sit at the narrow waist, can be applied to any traffic, and support both per-packet and per-flow granularity. IPv6 tokens require OS support for any practical usecase. The downside of IPv6 tokens is that IPv6 adoption is still limited, and many networks drop packets with IPv6 extension headers with rates described in {{RFC7872}}.
+IPv6 tokens sit at the narrow waist, can be applied to any traffic, and support both per-packet and per-flow granularity. IPv6 tokens require OS support for any practical usecase. The downside of IPv6 tokens is that IPv6 adoption is still limited, and many networks drop packets with IPv6 extension headers with rates described in {{RFC7872}}. However, this is expected to improve over time. 
 
 TLS tokens are limited to TLS/DTLS sessions, and can only be used at a flow granularity. Implementation does not depend on the OS, but rather at the cryptographic library used (e.g., BoringSSL or OpenSSL). As TLS handshake is integrity-protected, intermediate nodes cannot drop or alter a token. 
 
@@ -576,11 +542,11 @@ STUN tokens are targeted to real-time communications, and can only be used at a 
 
 The primary reason for making network tokens protocol agnostic is to ease adoption and enable interested parties (Operating System, application providers, users, network vendors and operators) to use them in a way that better fits the intended usecase. The protocol to use will largely depend on the parties involved in a usecase, the availability of tokens in different protocols, and the capability of endpoints and the network to insert and interpret tokens. 
 
-When possible, networks should make efforts to accept tokens in different protocols to allow further adoption from endpoints. As processing of tokens remains the same independent of the protocol that carries them, the main overhead from detecting tokens in multiple protocols will come from parsing and detecting tokens in different parts of the header. 
+When possible, networks should make efforts to accept tokens in different protocols to allow further adoption from endpoints. As processing of tokens remains the same independent of the protocol that carries them, the main overhead from detecting tokens in multiple protocols will come from parsing and detecting tokens in different parts of the header.
 
 ## Network Token granularity
 
-The granularity of a token is either per-packet or per-flow and is colsely related with the protocol where tokens are inserted. The trade-offs for each option are discussed below. 
+The granularity of a token is either per-packet or per-flow and is closely related with the protocol where tokens are inserted. The trade-offs for each option are discussed below. 
 
 ### Per-packet granularity
 
@@ -601,7 +567,7 @@ The main disadvantage of per-flow granularity is that it requires per-flow state
 
 Tokens might be interpreted one or more times within a network. 
 
-In many cases, a single interpretation will be enough. One example is  network policies that are enforced at a single point and involve per-flow state (like zero-rating). In such scenarios, token interpretation and policy enforcement can take place all in once. Alternatively, when policy enforcement involves mutliple nodes (e.g., a low-latency service that spans the wired and radio network), network owners can use existing mechanisms (like DiffServ, QCI tags, or reflective QoS) to enforce the policy across multiple nodes within the same network domain. 
+In many cases, a single interpretation will be enough. One example is  network policies that are enforced at a single point and involve per-flow state (like zero-rating). In such scenarios, token interpretation and policy enforcement can take place all in once. Alternatively, when policy enforcement involves multiple nodes (e.g., a low-latency service that spans the wired and radio network), network owners can use existing mechanisms (like DiffServ, QCI tags, or reflective QoS) to enforce the policy across multiple nodes within the same network domain. 
 
 In cases where a reverse flow might get routed through a different path, token reflection should be used. 
 
