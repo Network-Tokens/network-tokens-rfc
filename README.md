@@ -1,7 +1,7 @@
 # Network Tokens RFC
 This is the working area for the Network Tokens RFC. 
 
-[Editor's Copy](https://github.com/Network-Tokens/network-tokens-rfc/blob/master/network-tokens.txt)
+[Editor's Copy](https://github.com/Network-Tokens/network-tokens-rfc/blob/master/draft-yiakoumis-network-tokens-00.txt)
 
 
 ## Building the draft
