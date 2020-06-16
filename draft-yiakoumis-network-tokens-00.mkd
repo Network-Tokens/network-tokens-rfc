@@ -2,7 +2,7 @@
 title: Network Tokens
 abbrev: networktokens
 docname: draft-yiakoumis-network-tokens-00
-date: 2020-05-07
+date: 2020-06-15
 category: std
 
 ipr: trust200902
@@ -25,6 +25,13 @@ author:
     name: Nick McKeown
     organization: Stanford University
     email: nickm@stanford.edu
+
+
+ -
+    ins: F. Sorensen
+    name: Frode Sorensen
+    organization: Norwegian Communications Authority
+    email: frode.sorensen@nkom.ko
 
 normative:
   RFC7519:

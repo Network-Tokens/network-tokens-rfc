@@ -5,8 +5,10 @@
 TBD                                                         Y. Yiakoumis
 Internet-Draft                                      Selfie Networks, Inc
 Intended status: Standards Track                              N. McKeown
-Expires: November 8, 2020                            Stanford University
-                                                            May 07, 2020
+Expires: December 17, 2020                           Stanford University
+                                                             F. Sorensen
+                                      Norwegian Communications Authority
+                                                           June 15, 2020
 
 
                              Network Tokens
@@ -41,23 +43,23 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on November 8, 2020.
+   This Internet-Draft will expire on December 17, 2020.
 
 Copyright Notice
 
    Copyright (c) 2020 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
+
+
+
+Yiakoumis, et al.       Expires December 17, 2020               [Page 1]
+
+Internet-Draft                networktokens                    June 2020
+
+
    This document is subject to BCP 78 and the IETF Trust's Legal
    Provisions Relating to IETF Documents
-
-
-
-Yiakoumis & McKeown     Expires November 8, 2020                [Page 1]
-
-Internet-Draft                networktokens                     May 2020
-
-
    (https://trustee.ietf.org/license-info) in effect on the date of
    publication of this document.  Please review these documents
    carefully, as they describe your rights and restrictions with respect
@@ -104,16 +106,16 @@ Table of Contents
    8.  Implementation Considerations . . . . . . . . . . . . . . . .  22
      8.1.  Contents  . . . . . . . . . . . . . . . . . . . . . . . .  23
      8.2.  Encapsulating protocol  . . . . . . . . . . . . . . . . .  23
+
+
+
+Yiakoumis, et al.       Expires December 17, 2020               [Page 2]
+
+Internet-Draft                networktokens                    June 2020
+
+
      8.3.  Network Token granularity . . . . . . . . . . . . . . . .  24
        8.3.1.  Per-packet granularity  . . . . . . . . . . . . . . .  24
-
-
-
-Yiakoumis & McKeown     Expires November 8, 2020                [Page 2]
-
-Internet-Draft                networktokens                     May 2020
-
-
        8.3.2.  Per-flow granularity  . . . . . . . . . . . . . . . .  24
      8.4.  Token to DiffServ mapping and reflection  . . . . . . . .  25
    9.  Security Considerations . . . . . . . . . . . . . . . . . . .  25
@@ -159,16 +161,17 @@ Internet-Draft                networktokens                     May 2020
    token"), would be signed with the private key of the application
    provider, and could be interpreted and verified by any one with the
    application provider's public key.  It may also be bound to the IP
+
+
+
+
+Yiakoumis, et al.       Expires December 17, 2020               [Page 3]
+
+Internet-Draft                networktokens                    June 2020
+
+
    address of the application provider's server that generates the
    traffic so it cannot be used in a different context.
-
-
-
-
-Yiakoumis & McKeown     Expires November 8, 2020                [Page 3]
-
-Internet-Draft                networktokens                     May 2020
-
 
    Similarly, a token might state the request of an end-user to access a
    network service, such as a low-latency and reliable QoS SLA, in a
@@ -216,16 +219,15 @@ Internet-Draft                networktokens                     May 2020
    security, user privacy, business practices, and compliance with net
    neutrality regulation.
 
+
+
+Yiakoumis, et al.       Expires December 17, 2020               [Page 4]
+
+Internet-Draft                networktokens                    June 2020
+
+
    Identifying traffic of interest is not straight forward, as it often
    depends on context not present in the related packets themselves.
-
-
-
-Yiakoumis & McKeown     Expires November 8, 2020                [Page 4]
-
-Internet-Draft                networktokens                     May 2020
-
-
    For example, the decision to allow a packet through a firewall or
    zero-rating whitelist is based on the application that generated the
    packet, while routing a flow through a low-latency path depends on
@@ -271,16 +273,18 @@ Internet-Draft                networktokens                     May 2020
    threshold, and appropriately decide whether to add an application or
    not.  There are typically four sources of inaccuracy:
 
+
+
+
+
+Yiakoumis, et al.       Expires December 17, 2020               [Page 5]
+
+Internet-Draft                networktokens                    June 2020
+
+
    o  Third-party traffic: Most modern applications include third-party
       traffic which cannot be counted as part of the application
       signature (e.g., analytics, ads, social network plugins, etc).
-
-
-
-Yiakoumis & McKeown     Expires November 8, 2020                [Page 5]
-
-Internet-Draft                networktokens                     May 2020
-
 
    o  Out-of-sync application signature: Application signatures often
       change (when servers and/or domains are added or deleted).  When
@@ -326,17 +330,17 @@ Internet-Draft                networktokens                     May 2020
    networks.  Another metric is accuracy, as letting insecure traffic
    through a firewall can become a security risk.
 
+
+
+
+Yiakoumis, et al.       Expires December 17, 2020               [Page 6]
+
+Internet-Draft                networktokens                    June 2020
+
+
    Firewall whitelists are typically used in enterprise networks to
    allow traffic from certain applications through the network, or
    bypass an expensive classification path.
-
-
-
-
-Yiakoumis & McKeown     Expires November 8, 2020                [Page 6]
-
-Internet-Draft                networktokens                     May 2020
-
 
 2.1.3.  QoS
 
@@ -385,13 +389,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-
-
-
-
-Yiakoumis & McKeown     Expires November 8, 2020                [Page 7]
+Yiakoumis, et al.       Expires December 17, 2020               [Page 7]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
 2.2.  Existing mechanisms
@@ -445,9 +445,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020                [Page 8]
+Yiakoumis, et al.       Expires December 17, 2020               [Page 8]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
    o  Modern applications use a variety of protocols and architectures,
@@ -501,9 +501,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020                [Page 9]
+Yiakoumis, et al.       Expires December 17, 2020               [Page 9]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
    advance warning to update their DPI, and they can still leverage a
@@ -557,9 +557,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 10]
+Yiakoumis, et al.       Expires December 17, 2020              [Page 10]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
    applications cannot participate without modifications to their
@@ -613,9 +613,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 11]
+Yiakoumis, et al.       Expires December 17, 2020              [Page 11]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
 2.3.5.  Privacy
@@ -669,9 +669,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 12]
+Yiakoumis, et al.       Expires December 17, 2020              [Page 12]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
 4.  Contents
@@ -725,9 +725,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 13]
+Yiakoumis, et al.       Expires December 17, 2020              [Page 13]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
 4.1.4.  "iat" (Issued At) field
@@ -781,9 +781,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 14]
+Yiakoumis, et al.       Expires December 17, 2020              [Page 14]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
    o  Token Payload: Depending on the application, the token payload
@@ -837,9 +837,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 15]
+Yiakoumis, et al.       Expires December 17, 2020              [Page 15]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
    {"alg":"ES256", "kid":"N6fr1MDrEuu1eXRkFbcpX4WY62SKN7TKrhYf9PfJEd8"}
@@ -893,9 +893,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 16]
+Yiakoumis, et al.       Expires December 17, 2020              [Page 16]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
 {'srv':'lowlatency', 'msisdn':'+4151111111111', 'nti': 5871234, iat':1588116732, 'exp':1588203132}
@@ -949,9 +949,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 17]
+Yiakoumis, et al.       Expires December 17, 2020              [Page 17]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
    For the examples below we will use the following 227-byte long
@@ -1005,9 +1005,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 18]
+Yiakoumis, et al.       Expires December 17, 2020              [Page 18]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
 3900e3  # Network Token Extension with 227 bytes length
@@ -1061,9 +1061,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 19]
+Yiakoumis, et al.       Expires December 17, 2020              [Page 19]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
    The TLS handshake is protected for message integrity, and as such
@@ -1117,9 +1117,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 20]
+Yiakoumis, et al.       Expires December 17, 2020              [Page 20]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
 803000e3  # Network Token Extension with 227 bytes length
@@ -1173,9 +1173,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 21]
+Yiakoumis, et al.       Expires December 17, 2020              [Page 21]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
 1f1d  # Network Token Hop-by-Hop option with 29 8-octet length
@@ -1229,9 +1229,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 22]
+Yiakoumis, et al.       Expires December 17, 2020              [Page 22]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
    reflected by peers on the reverse flow.  This section discusses
@@ -1285,9 +1285,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 23]
+Yiakoumis, et al.       Expires December 17, 2020              [Page 23]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
    availability of tokens in different protocols, and the capability of
@@ -1341,9 +1341,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 24]
+Yiakoumis, et al.       Expires December 17, 2020              [Page 24]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
 8.4.  Token to DiffServ mapping and reflection
@@ -1397,9 +1397,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 25]
+Yiakoumis, et al.       Expires December 17, 2020              [Page 25]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
 10.  IANA Considerations { #iana }
@@ -1453,9 +1453,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 26]
+Yiakoumis, et al.       Expires December 17, 2020              [Page 26]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
    o  Description: Network Token
@@ -1509,9 +1509,9 @@ Internet-Draft                networktokens                     May 2020
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 27]
+Yiakoumis, et al.       Expires December 17, 2020              [Page 27]
 
-Internet-Draft                networktokens                     May 2020
+Internet-Draft                networktokens                    June 2020
 
 
    [RFC7519]  Jones, M., Bradley, J., and N. Sakimura, "JSON Web Token
@@ -1565,4 +1565,60 @@ Authors' Addresses
 
 
 
-Yiakoumis & McKeown     Expires November 8, 2020               [Page 28]
+Yiakoumis, et al.       Expires December 17, 2020              [Page 28]
+
+Internet-Draft                networktokens                    June 2020
+
+
+   Frode Sorensen
+   Norwegian Communications Authority
+
+   Email: frode.sorensen@nkom.ko
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Yiakoumis, et al.       Expires December 17, 2020              [Page 29]
