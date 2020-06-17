@@ -1,5 +1,5 @@
 # Network Tokens RFC
-This is the working area for the Network Tokens RFC. 
+This is the working area for the Network Tokens I-D. 
 
 [Editor's Copy](https://github.com/Network-Tokens/network-tokens-rfc/blob/master/draft-yiakoumis-network-tokens-00.txt)
 
@@ -11,6 +11,9 @@ Once installed, you can build the draft using:
 ~~~
 kdrfc network-tokens.mkd
 ~~~
+
+## IETF
+IETF Datatracker link for network tokens : https://datatracker.ietf.org/doc/draft-yiakoumis-network-tokens/
 
 ## Discussion
 TBD
