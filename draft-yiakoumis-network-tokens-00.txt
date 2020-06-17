@@ -1573,7 +1573,7 @@ Internet-Draft                networktokens                    June 2020
    Frode Sorensen
    Norwegian Communications Authority
 
-   Email: frode.sorensen@nkom.ko
+   Email: frode.sorensen@nkom.no
 
 
 
