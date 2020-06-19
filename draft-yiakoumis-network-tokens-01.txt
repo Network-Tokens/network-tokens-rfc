@@ -12,7 +12,7 @@ Expires: December 17, 2020                           Stanford University
 
 
                              Network Tokens
-                   draft-yiakoumis-network-tokens-00
+                   draft-yiakoumis-network-tokens-01
 
 Abstract
 
