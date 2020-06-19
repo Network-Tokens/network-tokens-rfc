@@ -1,7 +1,7 @@
 ---
 title: Network Tokens
 abbrev: networktokens
-docname: draft-yiakoumis-network-tokens-00
+docname: draft-yiakoumis-network-tokens-01
 date: 2020-06-15
 category: std
 
