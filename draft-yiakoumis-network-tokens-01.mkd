@@ -1,8 +1,8 @@
 ---
 title: Network Tokens
 abbrev: networktokens
-docname: draft-yiakoumis-network-tokens-01
-date: 2020-06-15
+docname: draft-yiakoumis-network-tokens-02
+date: 2020-12-16
 category: std
 
 ipr: trust200902
@@ -50,29 +50,28 @@ informative:
 
 --- abstract
 
-Network tokens is a method for endpoints to explicitly and securely coordinate with networks about how their traffic is treated. They are inserted by endpoints in existing protocols, interpreted by trusted networks, and may be signed or encrypted to meet security and privacy requirements. Network tokens provide a means for network operators to expose datapath services (such as a zero-rating service, a user-driven QoS service, or a firewall whitelist), and for end users and application providers to access such services. Network tokens are inspired and derived by existing security tokens (like JWT and CWT), and borrow several of their core ideas along with security and privacy properties. 
+Network tokens is a method for endpoints to explicitly and securely coordinate with a network about how their traffic is treated, in a user-centric and application-agnostic manner. They are inserted by endpoints in existing protocols, interpreted by trusted networks, and are encrypted to meet security and privacy requirements. Network tokens provide a means for network operators to expose datapath services (such as a low-latency QoS service), and for end users to access such services. 
 
 --- middle
 
 # Introduction        {#intro}
 
-This specification motivates and describes network tokens, a method for endpoints to explicitly coordinate with networks about how their traffic is treated. They provide a means for networks to expose datapath services, and for end users to access such services by appropriately tagging their traffic. Network tokens are intended for scenarios where there is explicit coordination and trust between endpoints and the network, like a zero-rating service, a user-driven QoS service, or a firewall whitelist. 
+This specification motivates and describes network tokens, a method for end users to explicitly coordinate with networks about how their traffic is treated. They provide a means for networks to expose datapath services, and for end users to access such services by appropriately tagging their traffic in a user-centric and application-agnostic manner. 
+
+Network tokens and the focus on user-centric and application agnostic QoS aims to balance three goals in modern networks. First, expose network capabilities (like a low-latency service) that can improve the end-user experience, in a way that could be monetized by network operators. Second, preserve the network's neutrality and ensure that accessing a network capability does not undermine a user's privacy or choice. And third, give application developers the capability to add such network functionality in their applications, as they are the ones that understand how to best improve the user experience for their own context.  
 
 ## Network Token Overview
 
-A network token is a small piece of data that end users attach to their packets. As packets flow through the network, intermediate nodes MAY detect tokens, interpret them, and apply the desired service to the packets that carry them (and possibly to all other packets from the same flow). 
+A network token is a small piece of data that end users attach to their packets. As packets flow through the network, intermediate nodes MAY detect tokens, interpret them, and apply the desired service to the packets that carry them (and possibly to all other packets from the same flow). Αt a high-level, a token embodies the end-user's authorization for certain traffic to access a network service, such as a low-latency and reliable QoS SLA, in a user-centric, application agnostic, and privacy preserving means.
 
-Tokens MAY be digitally signed, integrity protected and/or encrypted to account for privacy and security, and can be provisioned to prevent replay and spoofing attacks.
+Each token primarily consists of four fields: a unique user identifier (like an IP address or an MSISDN for cellular networks), a network service identifier (e.g., "Cool Operator's low-latency service"), an expiration date, and a nonce for revocability. 
 
-Tokens carry simple claims that can drive network policy.
+To account for privacy and security, tokens are encrypted and specially provisioned to prevent replay and spoofing attacks. The contents of the token are opaque and uninterpretable by everyone other than the operator (including the user).
 
-For example, a token might just state the name of the application that a packet originates from, which can then be used by firewalls and/or zero-rating whitelists. Such a token (an "application token"), would be signed with the private key of the application provider, and could be interpreted and verified by any one with the application provider's public key. It may also be bound to the IP address of the application provider's server that generates the traffic so it cannot be used in a different context.
+Network tokens do not dictate a dedicated header or protocol to be inserted. Instead, they are incorporated as options and extensions into a variety of existing protocols. For example, they can be carried as IPv6 Hop by Hop Options, or attributes during a STUN-enabled flow setup.
 
-Similarly, a token might state the request of an end-user to access a network service, such as a low-latency and reliable QoS SLA, in a user-centric, application agnostic, and privacy preserving means. Such a token (a "user-centric token"), will hold a unique user identifier (like an MSISDN), the keyword "lowlatency", an expiration date, a nonce for revocability, and will be encrypted with a network operator's secret key. The contents of the token will be opaque and uninterpretable by everyone other than the operator (including the user).
+Tokens provide a critical element to expose and access network services. Coupled with an appropriate mechanism for distribute and acquisition they can provide the necessary tools to build user-centric and application agnostic network services. This document discusses security and privacy implications, but  
 
-Tokens are policy-agnostic, i.e., they just provide a unified mechanism to communicate and interpret certain claims in the datapath. Network services built using tokens can dictate the desired policy through token (or token metadata) distribution, and the cryptographic functions applied to them.
-
-Network tokens do not dictate a dedicated header or protocol to be inserted. Instead, they are incorporated as options and extensions into a variety of existing protocols. For example, they can be carried as TLS Client and Server Hello extensions during a TLS handshake, as IPv6 Hop by Hop Options, or as attributes during a STUN-enabled flow setup. Network tokens are largely opaque to the protocols that carry them. 
 
 Network tokens are inspired and derived by existing security tokens, like JSON Web Token (JWT) {{RFC7519}} and CBOR Web Token (CWT) {{RFC8392}}, and borrow a lot of their properties in terms of security and privacy. In fact, network tokens MAY be represented as JWT and CWT objects, and respectively use JOSE and COSE technologies for signing and encryption. 
 
