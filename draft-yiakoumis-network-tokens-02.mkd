@@ -2,7 +2,6 @@
 title: Network Tokens
 abbrev: networktokens
 docname: draft-yiakoumis-network-tokens-02
-date: 2020-12-16
 category: std
 
 ipr: trust200902
@@ -71,7 +70,6 @@ To account for privacy and security, tokens are encrypted and specially provisio
 Network tokens do not dictate a dedicated header or protocol to be inserted. Instead, they are incorporated as options and extensions into a variety of existing protocols. For example, they can be carried as IPv6 Hop by Hop Options, or attributes during a STUN-enabled flow setup.
 
 Tokens provide a critical element to expose and access network services. Coupled with an appropriate mechanism for distribute and acquisition they can provide the necessary tools to build user-centric and application agnostic network services. This document discusses security and privacy implications, but  
-
 
 Network tokens are inspired and derived by existing security tokens, like JSON Web Token (JWT) {{RFC7519}} and CBOR Web Token (CWT) {{RFC8392}}, and borrow a lot of their properties in terms of security and privacy. In fact, network tokens MAY be represented as JWT and CWT objects, and respectively use JOSE and COSE technologies for signing and encryption. 
 
@@ -303,7 +301,7 @@ An application token can be used to whitelist traffic from trusted applications 
 
 The following example verifies that a network flow is coming from "The Godfather App". 
 
-The token payload is encoded as a JWT, and encapsulated as a TLS Extension attached in a Server Hello Message.
+The token payload is encoded as a JWT, and encapsulated as an IPv6 Extension header. 
 
 The Reflect Type is 0x00 (i.e., peers should not reflect it), with the expectation that network flows can setup appropriate state for the reverse flow as well. The Token Descriptor ID is 0x03, which might represent a registered value for application tokens. 
 
@@ -365,7 +363,7 @@ To support tokens, a protocol needs to allow its users to specify the token to b
 While tokens are designed to be self-contained, the protocols that carry them inevitably affect its use. In particular:
 
 - the maximum size of tokens is dictated by the provision of the protocol extension that carries them. 
-- Protocols that use a checksum over transmitted data (like TLS or optionally STUN) ensure that a token cannot be tampered or removed by intermediary nodes without the endpoints noticing it
+- Protocols that use a checksum over transmitted data (like STUN) ensure that a token cannot be tampered or removed by intermediary nodes without the endpoints noticing it
 - Implementations should also consider whether the protocol guarantees that a token is contained in a single packet or might be carried over multiple packets. 
 
 This section discusses the use of tokens in three widely used protocols, and section {#iana} describes recommended IANA changes for each protocol. 
@@ -386,55 +384,6 @@ For the examples below we will use the following 227-byte long network token, wh
 72e32556e32636a6f6a5267424f396349565f7869536d586357745a6e4535495475684973456a
 4f76726378472e3f9 # Network token payload (as JWE)
 ~~~
-
-## Network Tokens as a TLS Extension
-
-Network tokens can be encoded as TLS extensions during the handshake phase in ClientHello, ServerHello, and HelloRetryRequest messages, as these are defined in {{RFC8446}}. As the handshake happens before encryption is established between the two communicating endpoints, the token will be sent unchanged and can be interpreted by any trusted networks. 
-
-Network tokens used as TLS extension are flow-specific, i.e., the network should apply the policy linked to this token to all packets that belong to this flow. 
-
-The token comprises the extension data. Section {#iana} requests the value 57 as a Network Token extension type. For TLS backward compatibility, the first 16-bit after the extension type should encode the length of the extension data. The following bytestream defines the extension, including type and lengh data:
-
-~~~
-3900e3  # Network Token Extension with 227 bytes length
-1000001 # Network token is represented as JWT, reflect at node
-65794a68624763694f694a6b615849694c434a6c626d4d694f694a424d6a553251304a444c556
-8544e544579496e302e2e565f4278546d4e692d6b6337735a376b504e514851412e5a42764269
-6d6d46705579555165e544579634b36244566a31378546d4e692d6b6337735a376b50476676c4
-7597579666f734b43565234744576306a4d31735f4352484c50706a6335536d37703336487576
-677541467c7979396f3a526e7976532484cd37703336487553559797170e514851412e5a42764
-2696d6d4670557955516576676c47597579666f734b43565234744576306a4d31716535597971
-702d5946796838566a396f72337a7351624e6d4e6475796974727658436854766c66633055704
-4545597d429869d34e5486a63963305f6a5267424f39745a6e4535438566a396fe64757969747
-27658766c6655704417e252636f267349565f36d585a6e4547568f7672637835f4352484c5417
-72e32556e32636a6f6a5267424f396349565f7869536d586357745a6e4535495475684973456a
-4f76726378472e3f9 # Network token payload (as JWE)
-~~~
-
-If the reflect type is set to 0, the peer takes no additional step. If reflect type is 0x1, the peer should attach a Network Token request at the ServerHello message, set the type to 0x2, and copy the rest of the token in it. The extension data for the ServerHello message that reflects the token mentioned above is listed below.
-
-~~~
-3900e3  # Network Token Extension with 227 bytes length
-2000001 # Network token is represented as JWT, reflected token
-65794a68624763694f694a6b615849694c434a6c626d4d694f694a424d6a553251304a444c556
-8544e544579496e302e2e565f4278546d4e692d6b6337735a376b504e514851412e5a42764269
-6d6d46705579555165e544579634b36244566a31378546d4e692d6b6337735a376b50476676c4
-7597579666f734b43565234744576306a4d31735f4352484c50706a6335536d37703336487576
-677541467c7979396f3a526e7976532484cd37703336487553559797170e514851412e5a42764
-2696d6d4670557955516576676c47597579666f734b43565234744576306a4d31716535597971
-702d5946796838566a396f72337a7351624e6d4e6475796974727658436854766c66633055704
-4545597d429869d34e5486a63963305f6a5267424f39745a6e4535438566a396fe64757969747
-27658766c6655704417e252636f267349565f36d585a6e4547568f7672637835f4352484c5417
-72e32556e32636a6f6a5267424f396349565f7869536d586357745a6e4535495475684973456a
-4f76726378472e3f9 # Network token payload (as JWE)
-~~~
-
-TLS does not allow for extensions to be originated by the server if they are not defined in the ClientHello message. To account for cases where tokens need to be inserted by the server, the client might send an empty Network Token extension which allows the server to respond to with the appropriate token. Alternatively, the server can use a HelloRequestRetry message to ask the peer to re-send a ClientHello message with the NetworkToken extension included. The HelloRequestRetry should include the token. Depending on the reflect type the client peer might include an empty or populated Network Token extension on the subsequent ClientHello message. 
-
-The use of Network Token between ClientHello, ServerHello, and HelloRequestRetry messages resembles the mechanics of the cookie TLS extension. 
-
-The TLS handshake is protected for message integrity, and as such guarantees that network tokens cannot be dropped by intermediary nodes. 
-
 
 ## Network Tokens as a STUN Attribute
 
@@ -538,11 +487,9 @@ When deciding the contents of a token, applications should take effort to includ
 
 ## Encapsulating protocol
 
-This specification describes three protocols where tokens might be inserted, and it is expected that this list will grow.
+This specification describes two protocols where tokens might be inserted, and it is expected that this list will grow.
 
-IPv6 tokens sit at the narrow waist, can be applied to any traffic, and support both per-packet and per-flow granularity. IPv6 tokens require OS support for any practical usecase. The downside of IPv6 tokens is that IPv6 adoption is still limited, and many networks drop packets with IPv6 extension headers with rates described in {{RFC7872}}. However, this is expected to improve over time. 
-
-TLS tokens are limited to TLS/DTLS sessions, and can only be used at a flow granularity. Implementation does not depend on the OS, but rather at the cryptographic library used (e.g., BoringSSL or OpenSSL). As TLS handshake is integrity-protected, intermediate nodes cannot drop or alter a token. 
+IPv6 tokens sit at the narrow waist, can be applied to any traffic, and support both per-packet and per-flow granularity. IPv6 tokens are implemented as hop-by-hop options, which currently require admin privileges in most client Operating Systems. This can be particularly interesting for a user-centric system, where the OS can act as an agent on the user's behalf to acquire tokens, and accordingly manage which applications should have access to them. The downside of IPv6 tokens is that IPv6 adoption is still limited, and many networks drop packets with IPv6 extension headers with rates described in {{RFC7872}}. However, this is expected to improve over time. 
 
 STUN tokens are targeted to real-time communications, and can only be used at a flow granularity. Implementation does not depend on the OS, but rather at the library that initiates the related flows (e.g., WebRTC). As STUN messages are integrity-protected, intermediate nodes cannot drop or alter a token. 
 
@@ -583,7 +530,7 @@ As any cryptographic application, it is important for users of network token app
 
 The security of network tokens relies upon on the protections offered by the underlying signing and encryption technologies. It is therefore recommended that implementations of network tokens use existing and well-understood cryptographic frameworks (like JOSE and COSE) to protect tokens, or careful consider security implications if they provide their own format. 
 
-While tokens are integrity protected, an intermediary node can in theory replace or remove a token. Protection against this can be provided by additional integrity protection from the encapsulating protocol itself, as is the case with TLS handshakes and STUN.
+While tokens are integrity protected, an intermediary node can in theory replace or remove a token. Protection against this can be provided by additional integrity protection from the encapsulating protocol itself, as is the case with STUN.
 
 Network tokens may require processing in software, as current hardware platforms do not support cryptographic capabilities. This might impose a security risk and exposure to an attack, as traffic could be diverted towards the slow path, and in return degrade the overall performance of a node. It is recommended that implementations adequately account for such scenarios, either by setting a rate-limit to packets that go through a slow path or ensuring that the overall functionality is not affected. 
 
@@ -623,14 +570,6 @@ This section registers the value 0x0F as a IPv6 Hop-By-Hop and Destination Optio
 
 * Hex Value: 0x1F
 * Binary Value: 0x00011111
-* Description: Network Token
-* Reference: This document
-
-## TLS ExtensionType Registry
-
-This section registers the value 57 as a TLS Extension Type for network tokens.
-
-* Value: 57
 * Description: Network Token
 * Reference: This document
 
